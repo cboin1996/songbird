@@ -1,0 +1,50 @@
+name: Docker Build/Publish Image
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    env:
+      DOCKER_REGISTRY: docker.io
+      DOCKER_IMAGE: cboin/songbird
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_TARGET_PLATFORM_x64: linux/amd64
+      DOCKER_PUSH: false
+    steps:
+      - uses: actions/checkout@main
+      - name: Get Commit or Tag
+        id: vars
+        run: |
+          tag="${GITHUB_SHA:0:8}"
+          if [ "${GITHUB_EVENT_NAME}" == "release" ]; then
+            ref="${GITHUB_REF}"
+            tag=$(echo $GITHUB_REF | sed 's/refs\/tags\///g')
+          fi
+          echo "::set-output name=tag::$tag"
+      - name: Set up Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@v1
+        with:
+          version: 0.7.1
+      - name: Prepare
+        if: success()
+        id: prepare
+        run: |
+          echo ::set-output name=docker_platform_amd64::${DOCKER_TARGET_PLATFORM_x64}
+          echo ::set-output name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}
+          echo ::set-output name=version::${{steps.vars.outputs.tag}}
+      - name: Docker Login
+        if: success()
+        run: |
+          echo "${DOCKER_PASSWORD}" | docker login ${DOCKER_REGISTRY} --username "${DOCKER_USERNAME}" --password-stdin
+      - name: Run Buildx
+        if: success()  && github.event_name == 'pull_request' # trigger only a build on PR's.
+        run: |
+          docker buildx build --platform ${{ steps.prepare.outputs.docker_platform_amd64 }} --tag ${{ steps.prepare.outputs.docker_image }}:${{steps.prepare.outputs.version}} --file ./Dockerfile -o type=image,push=false .
+      - name: Run Buildx (push image)
+        if: success()  && github.event_name == 'push' # trigger a build and push to docker registry
+        run: |
+          docker buildx build --platform ${{ steps.prepare.outputs.docker_platform_amd64 }} --tag ${{ steps.prepare.outputs.docker_image }}:${{steps.prepare.outputs.version}} --file ./Dockerfile -o type=image,push=true .
