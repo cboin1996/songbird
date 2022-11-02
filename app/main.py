@@ -85,7 +85,7 @@ def run(config: settings.SongbirdConfig):
     current_mode = modes.Modes.SONG
     while True:
         logger.info("---Songbird Main Menu---")
-        album_song_properties = None
+        song_properties = None
 
         # launch album mode to collect songs
         if current_mode == modes.Modes.ALBUM:
@@ -117,8 +117,10 @@ def run(config: settings.SongbirdConfig):
                 continue
 
         logger.info(f"Searching for songs: {songs}")
-        for song in songs:
-            run_for_song(config, song, album_song_properties)
+        for i, song in enumerate(songs):
+            if album_song_properties is not None:
+                song_properties = album_song_properties[i]
+            run_for_song(config, song, song_properties)
 
     logger.info("Shutting down!")
 
