@@ -138,14 +138,10 @@ def parse_itunes_search_api(search_variable: str, mode: modes.Modes, limit:int=2
                                   lookup=lookup)
 
     # Present results to user
-    for i, item in enumerate(parsed_results_list):
-        logger.info("-------------------")
-        logger.info(i)
-        for key, val in item.__dict__.items():
-            logger.info(f"\t - {key} : {val}")
+    common.pretty_list_of_basemodel_printer(parsed_results_list)
     logger.info('Searched for: %s' % (search_variable))
     # Only one item can be selected
-    user_selection = common.select_items_from_list('Select the number for the properties you want.. [%d to %d]'% (0, len(parsed_results_list)-1), " ", parsed_results_list, 1)
+    user_selection = common.select_items_from_list('Select the number for the properties you want', " ", parsed_results_list, 1)
 
     # user has quit
     if user_selection is None:
@@ -161,7 +157,8 @@ def parse_itunes_search_api(search_variable: str, mode: modes.Modes, limit:int=2
 
     return user_selection[0]
 
-def remove_songs_selected(song_properties_list, required_json_keys):
+def remove_songs_selected(song_properties_list):
+    common.pretty_list_of_basemodel_printer(song_properties_list)
     input_string = "Enter song id's (1 4 5 etc.) you dont want from this album"
     user_input = common.select_items_from_list(input_string, " ", song_properties_list, n_choices=len(song_properties_list)-1, opposite=True, no_selection_value=-1)
     # user has quit
@@ -195,7 +192,7 @@ def launch_album_mode(artist_album_string=''):
         if songs_in_album_props == None:
             logger.error("Sorry. Cant seem to find any details for this album!")
 
-        songs_in_album_props = remove_songs_selected(song_properties_list=songs_in_album_props, required_json_keys=required_json_song_keys)
+        songs_in_album_props = remove_songs_selected(song_properties_list=songs_in_album_props)
         if songs_in_album_props is None:
             return None
 
@@ -219,7 +216,7 @@ def query_api(search_variable: str, limit: int, mode: modes.Modes, lookup: bool=
         itunes_response = requests.get('https://itunes.apple.com/lookup', params=search_parameters)
 
     # itunesResponse = requests.get('https://itunes.apple.com/search?term=jack+johnson')
-    logger.info("Connected to: ", itunes_response.url, itunes_response.status_code)
+    logger.info(f"Connected to {itunes_response.url}")
     if itunes_response.status_code != 200:
         logger.error("Oops. Something went wrong trying to connect to the itunes server.")
         logger.error(f"Code: {itunes_response.status_code}, Body: {itunes_response.content}")
@@ -230,12 +227,13 @@ def query_api(search_variable: str, limit: int, mode: modes.Modes, lookup: bool=
         try:
             if mode == modes.Modes.SONG:
                 result = itunes_api.ItunesApiSongModel.parse_obj(search_result)
+                year = search_result[result.releaseDateKey].split('-')[0] # will grab the year from date formatted 2016-06-01
+                result.releaseDate = year
             elif mode == modes.Modes.ALBUM:
                 result = itunes_api.ItunesApiAlbumKeys.parse_obj(search_result)
-            year = search_result[result.releaseDateKey].split('-')[0] # will grab the year from date formatted 2016-06-01
-            result.releaseDate = year
+
             parsed_results_list.append(result)
         except ValidationError as e:
-            logger.warn(f"Skipping song data at index [{index}] as it could not be loaded into expected format: {e}")
+            logger.warn(f"Skipping the display of song at index [{index}] as it could not be loaded into expected format.\n{e}")
 
     return parsed_results_list

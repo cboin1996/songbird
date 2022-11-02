@@ -3,20 +3,21 @@ import logging
 import glob
 import os
 
-from models import itunes_api
+from models import itunes_api, modes
 from typing import Optional
 import logging
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
-def set_logger_config_globally(timestamp: str) -> None:
+def set_logger_config_globally(log_level=logging.INFO) -> None:
     """Sets the python logging module settings for output
     to stdout and to file.
     Args:
         timestamp (str): the timestamp to name the log file.
     """
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        level=log_level,
+        format="[%(levelname)s] %(name)s: %(message)s",
         handlers=[logging.StreamHandler()],
     )
 
@@ -29,6 +30,7 @@ def name_plate():
     print("===============================")
     print("=-----Welcome to songbird-----=")
     print("===============================")
+    print(f"At the main menu, type of of {[mode.value for mode in modes.Modes]} to switch modes!")
 
 def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] = None):
     while True:
@@ -44,7 +46,7 @@ def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] 
             return inp
 
         try:
-            typed = out_type(prompt)
+            typed = out_type(inp)
 
             if choices is None:
                 return typed
@@ -124,7 +126,7 @@ def find_file(path: str, filename: str) -> List[str]:
     paths = glob.glob(os.path.join(path, filename))
     return paths
 
-def pretty_dct_printer(list_of_dicts: List[dict], ignore_keys=None):
+def pretty_list_of_basemodel_printer(list_of_dicts: List[BaseModel], ignore_keys=None):
     """
     prints list from top down so its more user friendly, items are pretty big
     params:
@@ -134,8 +136,8 @@ def pretty_dct_printer(list_of_dicts: List[dict], ignore_keys=None):
     i = len(list_of_dicts) - 1
     logger.info("------------------------")
     for element in reversed(list_of_dicts):
-        logger.info(i, end='')
-        for k,v in element.items():
+        logger.info(i)
+        for k,v in element.dict().items():
             if ignore_keys is not None:
                 if k not in ignore_keys: # print the key and value if not in ignore_keys or special_dict
                     print('\t%s - %s' % (k, v))
@@ -164,22 +166,38 @@ def select_items_from_list(prompt: str, sep: str, lyst: List, n_choices: int, qu
     Returns Optiona[List]: None if user quits, [] if user selects nothing, otherwise a list of the users selections are returned.
     """
     tries = 0
+    low = 0
+    high = len(lyst)-1
+    # provide useful ranges to user
+    if high == 0:
+        range_display = ""
+    elif high == 1:
+        range_display = f" (choose {high})"
+    else:
+        range_display = f" (choose {low} to {high}) "
+    # fill appropriate prompt based on opposite feature
+    if opposite:
+        opposite_prompt = " select all"
+    else:
+        opposite_prompt = " continue without selection"
+
     while True:
         tries += 1
         if tries > 5:
             logger.info(f"Wtf man. {tries} tries so far? Just get it right!")
-        inp = get_input_list(prompt+ f" [ {no_selection_value} to continue without property selection]", sep, out_type=int)
+        # get user input
+        inp = get_input_list(prompt+ f"{range_display}[{no_selection_value} {opposite_prompt}]", sep, out_type=int)
         if inp is None:
             return None
-        if inp is no_selection_value:
+        # verify if the value of the input is the selection value
+        if inp[0] == no_selection_value:
             return []
         # if user has entered too many choices, try again!!
         if len(inp) > n_choices:
             logger.error(f"You're only allowed {n_choices} here. Try again.")
             continue
         # user has passed validation, now check the values are reasonable
-        low = 0
-        high = len(lyst)-1
+
         boundary_check_passed = True
         for val in inp:
             if val > high or val < low:
@@ -194,7 +212,7 @@ def select_items_from_list(prompt: str, sep: str, lyst: List, n_choices: int, qu
                 result.append(lyst[val])
         else:
             result = []
-            for val in lyst:
-                if val not in inp:
-                    result.append(val)
+            for idx in range(len(lyst)):
+                if idx not in inp:
+                    result.append(lyst[idx])
         return result

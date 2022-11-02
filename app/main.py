@@ -7,21 +7,30 @@ import common
 from config import settings
 from models import modes, itunes_api
 import itunes
+import youtube
 
 logger = logging.getLogger(__name__)
 
 
-def mode_select(valid_modes=modes.Modes, quit_str="q") -> Optional[modes.Modes]:
-    mode = common.get_input_list("Please input song(s), separated by ';'. E.g. song1; song2; song3. To initiate album mode, type 'alb'", out_type=str, sep="; ")
-    if mode is None:
-        return
+def resolve_mode(inp: str, current_mode: modes.Modes = modes.Modes.SONG) -> Optional[modes.Modes]:
+    """Resolve the mode based on a given mode, against the current mode
+
+    Args:
+        inp (str): user input
+        current_mode (modes.Modes, optional): The current mode of the app. Defaults to modes.Modes.SONG.
+
+    Returns:
+        Optional[modes.Modes]: return the mode if the current mode needs to be changed, otherwise return nothing.
+    """
     try:
-        return modes.Modes(mode[0])
-
+        mode = modes.Modes(inp)
+        if mode != current_mode:
+            logger.info(f"Switched to {mode.value} mode!")
+            return mode
+        else:
+            return None
     except ValueError:
-        logger.info(f"Initiating download sequence for: {mode}")
-
-    return mode
+        return None
 
 def run_for_song(config: settings.SongbirdConfig, song_name: str, song_properties: Optional[itunes_api.ItunesApiSongModel]):
     """Run a cycle of the application given a song.
@@ -56,29 +65,40 @@ def run_for_song(config: settings.SongbirdConfig, song_name: str, song_propertie
         song_properties = itunes.parse_itunes_search_api(song_name, modes.Modes.SONG)
 
     # TODO: Implement downloading a song.
-    yt_links = run_song_selector()
+    yt_links = youtube.get_youtube_song_list()
 
 def run(config: settings.SongbirdConfig):
-    common.set_logger_config_globally(timestamp=datetime.datetime.now())
-    print(common.name_plate())
+    common.set_logger_config_globally()
+    common.name_plate()
+    current_mode = modes.Modes.SONG
     while True:
-        # select app mode
-        mode_or_songs = mode_select()
+        logger.info("---Songbird Main Menu---")
         album_song_properties = None
-        # none type mode indicates user has quit.
-        if mode_or_songs is None:
-           return
 
         # launch album mode to collect songs
-        if mode_or_songs == modes.Modes.ALBUM:
-            # TODO: implement
-            album_name = common.get_input("Enter an album name", out_type=str)
-            album_song_properties = itunes.launch_album_mode(album_name)
-            songs = [song.trackName for song in songs_in_album_props]
+        if current_mode == modes.Modes.ALBUM:
+            album_name = common.get_input(f"Enter an album name.", out_type=str)
+            # quit condition
+            if album_name is None:
+                break
+            mode = resolve_mode(album_name, current_mode=current_mode)
+            # detect mode change and return to main menu
+            if mode is not None:
+                current_mode = mode
+                continue
 
-        # by default, use songs provided in mode selection
-        else:
-            songs = mode_or_songs
+            album_song_properties = itunes.launch_album_mode(album_name)
+            songs = [song.trackName for song in album_song_properties]
+        elif current_mode == modes.Modes.SONG:
+            songs = common.get_input_list("Please input song(s), separated by ';'. E.g. song1; song2; song3.", out_type=str, sep="; ")
+            # quit condition
+            if songs is None:
+                break
+            mode = resolve_mode(songs[0], current_mode=current_mode)
+            # detect mode change and return to main menu
+            if mode is not None:
+                current_mode = mode
+                continue
 
         logger.info(f"Searching for songs: {songs}")
         for song in songs:
