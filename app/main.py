@@ -12,7 +12,9 @@ import youtube
 logger = logging.getLogger(__name__)
 
 
-def resolve_mode(inp: str, current_mode: modes.Modes = modes.Modes.SONG) -> Optional[modes.Modes]:
+def resolve_mode(
+    inp: str, current_mode: modes.Modes = modes.Modes.SONG
+) -> Optional[modes.Modes]:
     """Resolve the mode based on a given mode, against the current mode
 
     Args:
@@ -32,7 +34,12 @@ def resolve_mode(inp: str, current_mode: modes.Modes = modes.Modes.SONG) -> Opti
     except ValueError:
         return None
 
-def run_for_song(config: settings.SongbirdConfig, song_name: str, song_properties: Optional[itunes_api.ItunesApiSongModel]):
+
+def run_for_song(
+    config: settings.SongbirdConfig,
+    song_name: str,
+    song_properties: Optional[itunes_api.ItunesApiSongModel],
+):
     """Run a cycle of the application given a song.
 
     Args:
@@ -50,13 +57,17 @@ def run_for_song(config: settings.SongbirdConfig, song_name: str, song_propertie
         file_itunes = itunes.itunes_lib_search(config.itunes_lib_path, song_name)
     # check if song exists locally in google drive folder
     if config.gdrive_enabled:
-        file_gdrive = common.find_file(config.get_gdrive_folder_path(), f"*{song_name}*")
+        file_gdrive = common.find_file(
+            config.get_gdrive_folder_path(), f"*{song_name}*"
+        )
     # if any of the above, ask user if they want to download anyways
     files = file_local + file_itunes + file_gdrive
     if len(file_local) > 0:
         logger.info("Found the following similar files:")
         common.pretty_lst_printer(files)
-        inp = common.get_input("Do you want to proceed with download anyway?", choices=["y", "n"])
+        inp = common.get_input(
+            "Do you want to proceed with download anyway?", choices=["y", "n"]
+        )
 
         if inp == "q" or "n":
             return
@@ -66,6 +77,7 @@ def run_for_song(config: settings.SongbirdConfig, song_name: str, song_propertie
 
     # TODO: Implement downloading a song.
     yt_links = youtube.get_youtube_song_list()
+
 
 def run(config: settings.SongbirdConfig):
     common.set_logger_config_globally()
@@ -90,7 +102,11 @@ def run(config: settings.SongbirdConfig):
             album_song_properties = itunes.launch_album_mode(album_name)
             songs = [song.trackName for song in album_song_properties]
         elif current_mode == modes.Modes.SONG:
-            songs = common.get_input_list("Please input song(s), separated by ';'. E.g. song1; song2; song3.", out_type=str, sep="; ")
+            songs = common.get_input_list(
+                "Please input song(s), separated by ';'. E.g. song1; song2; song3.",
+                out_type=str,
+                sep="; ",
+            )
             # quit condition
             if songs is None:
                 break
@@ -105,6 +121,7 @@ def run(config: settings.SongbirdConfig):
             run_for_song(config, song, album_song_properties)
 
     logger.info("Shutting down!")
+
 
 if __name__ == "__main__":
     run(config=settings.SongbirdConfig())

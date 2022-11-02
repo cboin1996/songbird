@@ -8,8 +8,11 @@ from pydantic import BaseModel, BaseSettings
 import sys
 
 from models import itunes_api
+
+
 class SongbirdConfig(BaseSettings):
     """Configuration using .env file or defaults declared in here"""
+
     run_local: bool = False
     root_path: str = sys.path[0]
     itunes_search_api_base_url: str = "https://itunes.apple.com/search"

@@ -9,6 +9,8 @@ import logging
 from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
+
+
 def set_logger_config_globally(log_level=logging.INFO) -> None:
     """Sets the python logging module settings for output
     to stdout and to file.
@@ -21,6 +23,7 @@ def set_logger_config_globally(log_level=logging.INFO) -> None:
         handlers=[logging.StreamHandler()],
     )
 
+
 def name_plate():
     """
     Produces the application nameplate.
@@ -30,7 +33,10 @@ def name_plate():
     print("===============================")
     print("=-----Welcome to songbird-----=")
     print("===============================")
-    print(f"At the main menu, type of of {[mode.value for mode in modes.Modes]} to switch modes!")
+    print(
+        f"At the main menu, type of of {[mode.value for mode in modes.Modes]} to switch modes!"
+    )
+
 
 def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] = None):
     while True:
@@ -38,7 +44,7 @@ def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] 
         if choices is not None:
             built_prompt += f" , choices=({choices})"
         built_prompt += " ['q' quits]: "
-        inp = input(built_prompt )
+        inp = input(built_prompt)
         if inp == quit_str:
             return None
 
@@ -86,13 +92,16 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
             try:
                 typed_inp = type(item)
             except ValueError as e:
-                logger.error(f"Invalid input {inp} recieved, expected list with types: {out_type}, separated by '{sep}'")
+                logger.error(
+                    f"Invalid input {inp} recieved, expected list with types: {out_type}, separated by '{sep}'"
+                )
                 type_check_passed = False
         if not type_check_passed:
             continue
 
         typed_list.append(out_type(item))
         return typed_list
+
 
 def remove_illegal_characters(filename):
     """
@@ -101,17 +110,19 @@ def remove_illegal_characters(filename):
         filename(str): the file's name to strip
     Returns: stipped file name
     """
-    return filename\
-        .replace('\\', '')\
-        .replace('"', '')\
-        .replace('/', '')\
-        .replace('*', '')\
-        .replace('?', '')\
-        .replace('<', '')\
-        .replace('>', '')\
-        .replace('|', '')\
-        .replace("'", '')\
-        .replace(':', '')
+    return (
+        filename.replace("\\", "")
+        .replace('"', "")
+        .replace("/", "")
+        .replace("*", "")
+        .replace("?", "")
+        .replace("<", "")
+        .replace(">", "")
+        .replace("|", "")
+        .replace("'", "")
+        .replace(":", "")
+    )
+
 
 def find_file(path: str, filename: str) -> List[str]:
     """Simple glob search for a file
@@ -126,6 +137,7 @@ def find_file(path: str, filename: str) -> List[str]:
     paths = glob.glob(os.path.join(path, filename))
     return paths
 
+
 def pretty_list_of_basemodel_printer(list_of_dicts: List[BaseModel], ignore_keys=None):
     """
     prints list from top down so its more user friendly, items are pretty big
@@ -137,22 +149,33 @@ def pretty_list_of_basemodel_printer(list_of_dicts: List[BaseModel], ignore_keys
     logger.info("------------------------")
     for element in reversed(list_of_dicts):
         logger.info(i)
-        for k,v in element.dict().items():
+        for k, v in element.dict().items():
             if ignore_keys is not None:
-                if k not in ignore_keys: # print the key and value if not in ignore_keys or special_dict
-                    print('\t%s - %s' % (k, v))
+                if (
+                    k not in ignore_keys
+                ):  # print the key and value if not in ignore_keys or special_dict
+                    print("\t%s - %s" % (k, v))
 
-            else: # (default case) print the key and value
-                print('\t%s - %s' % (k, v))
-        i -=1
+            else:  # (default case) print the key and value
+                print("\t%s - %s" % (k, v))
+        i -= 1
         print("------------------------")
+
 
 def pretty_lst_printer(lyst: List):
     for idx, item in enumerate(lyst):
-       logger.info(f"\t [{idx}] - {item}")
+        logger.info(f"\t [{idx}] - {item}")
 
-def select_items_from_list(prompt: str, sep: str, lyst: List, n_choices: int, quit_str: str = "q", opposite: bool=False,
-    no_selection_value=-1) -> List:
+
+def select_items_from_list(
+    prompt: str,
+    sep: str,
+    lyst: List,
+    n_choices: int,
+    quit_str: str = "q",
+    opposite: bool = False,
+    no_selection_value=-1,
+) -> List:
     """Input validation against a list.
 
     Args:
@@ -167,7 +190,7 @@ def select_items_from_list(prompt: str, sep: str, lyst: List, n_choices: int, qu
     """
     tries = 0
     low = 0
-    high = len(lyst)-1
+    high = len(lyst) - 1
     # provide useful ranges to user
     if high == 0:
         range_display = ""
@@ -186,7 +209,11 @@ def select_items_from_list(prompt: str, sep: str, lyst: List, n_choices: int, qu
         if tries > 5:
             logger.info(f"Wtf man. {tries} tries so far? Just get it right!")
         # get user input
-        inp = get_input_list(prompt+ f"{range_display}[{no_selection_value} {opposite_prompt}]", sep, out_type=int)
+        inp = get_input_list(
+            prompt + f"{range_display}[{no_selection_value} {opposite_prompt}]",
+            sep,
+            out_type=int,
+        )
         if inp is None:
             return None
         # verify if the value of the input is the selection value
@@ -201,7 +228,9 @@ def select_items_from_list(prompt: str, sep: str, lyst: List, n_choices: int, qu
         boundary_check_passed = True
         for val in inp:
             if val > high or val < low:
-                logger.error(f"Sorry, the value {val} is out of bounds. Please enter within the interval [{low}, {high}]")
+                logger.error(
+                    f"Sorry, the value {val} is out of bounds. Please enter within the interval [{low}, {high}]"
+                )
                 boundary_check_passed = False
         if not boundary_check_passed:
             continue

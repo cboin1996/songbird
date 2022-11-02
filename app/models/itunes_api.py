@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
+
+
 class ItunesApiSongModel(BaseModel):
     trackName: str
     artistName: str
@@ -14,6 +16,7 @@ class ItunesApiSongModel(BaseModel):
     discCount: int = None
     releaseDate: str
     releaseDateKey: str = "releaseDate"
+
 
 class ItunesApiAlbumKeys(BaseModel):
     artistName: str
