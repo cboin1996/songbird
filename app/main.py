@@ -173,7 +173,7 @@ def run(config: settings.SongbirdConfig):
                     session =  web.SimpleSession("youtube", root_url=config.youtube_home_url)
 
             logger.info("---Songbird Main Menu---")
-            album_song_properties = None
+            song_properties = None
 
             # launch album mode to collect songs
             if current_mode == modes.Modes.ALBUM:
@@ -205,8 +205,10 @@ def run(config: settings.SongbirdConfig):
                     continue
 
             logger.info(f"Searching for songs: {songs}")
-            for song in songs:
-                success = run_for_song(config, song, album_song_properties, session)
+            for i, song in enumerate(songs):
+                if album_song_properties is not None:
+                    song_properties = album_song_properties[i]
+                success = run_for_song(config, song, song_properties, session)
     except KeyboardInterrupt as e:
         logger.info("\nReceived keyboard interrupt :o")
     logger.info("Shutting down!")
