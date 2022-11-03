@@ -174,7 +174,7 @@ def run(config: settings.SongbirdConfig):
 
             logger.info("---Songbird Main Menu---")
             song_properties = None
-
+            album_song_properties = None
             # launch album mode to collect songs
             if current_mode == modes.Modes.ALBUM:
                 album_name = common.get_input(f"Enter an album name.", out_type=str)
