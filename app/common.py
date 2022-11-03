@@ -90,7 +90,7 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
         type_check_passed = True
         for item in str_list:
             try:
-                typed_inp = type(item)
+                typed_inp = out_type(item)
             except ValueError as e:
                 logger.error(
                     f"Invalid input {inp} recieved, expected list with types: {out_type}, separated by '{sep}'"
@@ -169,12 +169,13 @@ def pretty_lst_printer(lyst: List):
 
 def select_items_from_list(
     prompt: str,
-    sep: str,
     lyst: List,
     n_choices: int,
+    sep: Optional[str]=None,
     quit_str: str = "q",
     opposite: bool = False,
     no_selection_value=-1,
+    return_value: bool = True
 ) -> List:
     """Input validation against a list.
 
@@ -186,6 +187,7 @@ def select_items_from_list(
         quit_str (str): The string to cancel validation and exit. Defaults to "q".
         opposite (bool): return everything BUT the user selection
         no_selection_value (any): value to indicate no selection wanted from the user
+        return_value (bool): if true, return the value, otherwise return the indicies of selections
     Returns Optiona[List]: None if user quits, [] if user selects nothing, otherwise a list of the users selections are returned.
     """
     tries = 0
@@ -234,14 +236,21 @@ def select_items_from_list(
                 boundary_check_passed = False
         if not boundary_check_passed:
             continue
-        # if user gets passed all of above, actually select values at this point, and return
+
+        # if user gets passed all of above, actually select values or indices at this point, and return
         if not opposite:
             result = []
             for val in inp:
-                result.append(lyst[val])
+                if return_value:
+                    result.append(lyst[val])
+                else:
+                    result.append(val)
         else:
             result = []
             for idx in range(len(lyst)):
                 if idx not in inp:
-                    result.append(lyst[idx])
+                    if return_value:
+                        result.append(lyst[idx])
+                    else:
+                        result.append(idx)
         return result

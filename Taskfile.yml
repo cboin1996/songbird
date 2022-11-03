@@ -74,3 +74,10 @@ tasks:
     prefix: run
     cmds:
       - docker run --rm --name {{.APP_NAME}} --log-level debug
+
+  env:
+    prefix: env
+    cmds:
+      - "echo 'RUN_LOCAL=false' >> .env"
+      - "echo 'ITUNES_ENABLED=true' >> .env"
+      - "echo 'GDRIVE_ENABLED=true' >> .env"

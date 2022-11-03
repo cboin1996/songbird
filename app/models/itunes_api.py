@@ -8,18 +8,17 @@ class ItunesApiSongModel(BaseModel):
     collectionName: str
     artworkUrl100: str
     primaryGenreName: str
-    trackNumber: str = None
-    trackCount: str
-    collectionId: str
-    collectionArtistName: Optional[str]
-    discNumber: int = None
-    discCount: int = None
+    trackNumber: int
+    trackCount: int
+    collectionId: str = ""
+    collectionArtistName: str = ""
+    discNumber: int
+    discCount: int
     releaseDate: str
     releaseDateKey: str = "releaseDate"
-
 
 class ItunesApiAlbumKeys(BaseModel):
     artistName: str
     collectionName: str
-    trackCount: str
+    trackCount: int
     collectionId: str
