@@ -15,17 +15,32 @@ class SongbirdConfig(BaseSettings):
 
     run_local: bool = False
     root_path: str = sys.path[0]
+    data_path = "data"
     itunes_search_api_base_url: str = "https://itunes.apple.com/search"
     itunes_enabled: bool = True
-    itunes_folder_path: Optional[str] = "itunes"
-    itunes_lib_path: Optional[str] = ""
-    gdrive_enabled: bool = False
-    gdrive_folder_path: Optional[str] = None
-    gdrive_secret_path_str: Optional[str] = None
+    itunes_folder_path: Optional[str] = "itunesauto"
+    itunes_lib_path: Optional[str] = "ituneslib"
+    gdrive_enabled: bool = True
+    gdrive_folder_path: Optional[str] = "gdrive"
     local_song_store_str: str = "dump"
+    youtube_dl_enabled = True
+    youtube_home_url = "https://www.youtube.com"
+    youtube_search_url = "https://www.youtube.com/results"
+    youtube_search_tag = "search_query"
+    youtube_searchform_payload = {youtube_search_tag: ""}
+    youtube_dl_retries = 3
+
+
+    class Config:
+        config_path = os.path.join(os.path.dirname(sys.path[0]), ".env")
+        env_file = config_path
+        env_file_encoding = "utf-8"
+
+    def get_data_path(self):
+        return os.path.join(self.root_path, self.data_path)
 
     def get_local_folder_path(self):
-        return os.path.join(self.root_path, self.local_song_store_str)
+        return os.path.join(self.get_data_path(), self.local_song_store_str)
 
     def get_itunes_folder_path(self):
         """If you run the app locally, configure the gdrive path as an absolute path. Otherwise, the program will
@@ -34,11 +49,11 @@ class SongbirdConfig(BaseSettings):
         Returns:
             str: the path to where itunes destined songs should live
         """
-        if run_local:
+        if self.run_local:
             return itunes_folder_path
-        return os.path.join(self.root_path, self.itunes_folder_path)
+        return os.path.join(self.get_data_path(), self.itunes_folder_path)
 
     def get_gdrive_folder_path(self):
-        if run_local:
+        if self.run_local:
             return gdrive_folder_path
-        return os.path.join(self.root_path, self.gdrive_folder_path)
+        return os.path.join(self.get_data_path(), self.gdrive_folder_path)

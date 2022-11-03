@@ -82,7 +82,7 @@ def m4a_tagger(file_path: str, song_tag_data: itunes_api.ItunesApiSongModel) -> 
     try:
         logger.info(f"Adding tags to m4a file : {file_path}")
 
-        response = artwork_searcher(artworkUrl=song_tag_data.artworkUrl100)
+        response = artwork_searcher(url=song_tag_data.artworkUrl100)
         audiofile = MP4(file_path)
 
         # Set all the tags for the mp3, all without if statement were checked for existence.
@@ -120,13 +120,13 @@ def mp3ID3Tagger(mp3_path: str, song_tag_data: itunes_api.ItunesApiSongModel):
     """
     try:
         # Create MP3File instance.
-        logger.info("Adding your tags to mp3 file: ", mp3_path)
+        logger.info(f"Adding your tags to mp3 file: {mp3_path}")
         # Have to call MP3File twice for it to work.
 
         # Get the image to show for a song .. but get high res
         # get album artwork from the list of sizes
 
-        response = artwork_searcher(artworkUrl=song_tag_data.artworkUrl100)
+        response = artwork_searcher(url=song_tag_data.artworkUrl100)
 
         # Set all the tags for the mp3, all without if statement were checked for existence.
         audiofile = eyed3.load(mp3_path)
@@ -139,7 +139,7 @@ def mp3ID3Tagger(mp3_path: str, song_tag_data: itunes_api.ItunesApiSongModel):
         audiofile.tag.recording_date = song_tag_data.releaseDate
 
         if (
-            globalvariables.collection_artist_name in dictionary_of_tags.keys()
+            song_tag_data.collectionArtistName is not None
         ):  # check if collection_artist_name exists before adding to tags
             audiofile.tag.album_artist = song_tag_data.collectionArtistName
 
@@ -174,7 +174,7 @@ def parse_itunes_search_api(
     logger.info("Searched for: %s" % (search_variable))
     # Only one item can be selected
     user_selection = common.select_items_from_list(
-        "Select the number for the properties you want", " ", parsed_results_list, 1
+        "Select the number for the properties you want", parsed_results_list, 1
     )
 
     # user has quit
@@ -191,6 +191,18 @@ def parse_itunes_search_api(
 
     return user_selection[0]
 
+def convert_mp3_to_itunes_format(input_filename):
+    """Convert the mp3 file to itunes format, updating tags to the new itunes standard.
+    Args:
+        input_filename (str): the full path of the file
+    Returns:
+        str: the path to the modified file.
+    """
+    pydub.AudioSegment.ffmpeg = updates.get_path_to_ffmpeg()
+    song_file = pydub.AudioSegment.from_mp3(input_filename)
+    output_filename = input_filename.replace(".mp3", ".m4a")
+    song_file.export(output_filename, format="ipod")
+    return output_filename
 
 def remove_songs_selected(song_properties_list):
     common.pretty_list_of_basemodel_printer(song_properties_list)
@@ -308,3 +320,30 @@ def query_api(
             )
 
     return parsed_results_list
+
+def artwork_searcher(url):
+    """Album artwork searcher.
+
+    Args:
+        url (str): the url for the artwork
+
+    Returns:
+        requests.Response: the response for the artwork request
+    """
+    artwork_size_list = ['100x100', '500x500', '1000x1000', '1500x1500', '2000x2000', '2500x2500', '3000x3000']
+    i = len(artwork_size_list) - 1
+
+    response = requests.get(url.replace('100x100', artwork_size_list[i]))
+    while response.status_code != 200 and i != 0:
+        logger.info(f'- Size not found -- Trying size: {artwork_size_list[i]}')
+        response = requests.get(url.replace('100x100', artwork_size_list[i]))
+        i -= 1
+
+    if i == 0:
+        logger.info('Couldnt find album art. Your file wont have the art.')
+        return None
+
+    else:
+        logger.info(f'Found art at size: {artwork_size_list[i]}')
+
+    return response
