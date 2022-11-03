@@ -18,6 +18,9 @@ docker run -it cboin/songbird:latest --env-file .env -v "path/to/itunesautoadd":
 # Minimal configuration
 By default, the app assumes itunes is installed. At minimum, create a `.env` file with to run without either.
 
+In addition, you need a folder to store local files in. This folder will be passed as a volume mount to the 
+dockerized app, as above in `-v "path/to/local/files":"app/data/dump"`
+
 ```.env
 ITUNES_ENABLED=False
 GDRIVE_ENABLED=False
