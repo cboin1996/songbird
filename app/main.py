@@ -211,6 +211,7 @@ def run(config: settings.SongbirdConfig):
                 success = run_for_song(config, song, song_properties, session)
     except KeyboardInterrupt as e:
         logger.info("\nReceived keyboard interrupt :o")
+
     logger.info("Shutting down!")
     session.close()
 
