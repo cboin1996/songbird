@@ -31,7 +31,6 @@ class SongbirdConfig(BaseSettings):
     youtube_searchform_payload = {youtube_search_tag: ""}
     youtube_dl_retries = 3
 
-
     class Config:
         config_path = os.path.join(os.path.dirname(sys.path[0]), ".env")
         env_file = config_path

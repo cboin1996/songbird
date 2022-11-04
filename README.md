@@ -80,3 +80,17 @@ cboin/songbird:v0.0.0
 
 Replace `path/to/itunesautoadd` with the path to the `automatically add to itunes folder`.
 Replace `path/to/ituneslib` with the path to the `itunes library` on your pc.
+
+# Dev
+To lint the app, run
+
+```
+pip install black
+pip install isort
+pip install click
+```
+
+Then,
+```
+task lint
+```

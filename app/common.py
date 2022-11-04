@@ -171,11 +171,11 @@ def select_items_from_list(
     prompt: str,
     lyst: List,
     n_choices: int,
-    sep: Optional[str]=None,
+    sep: Optional[str] = None,
     quit_str: str = "q",
     opposite: bool = False,
     no_selection_value=-1,
-    return_value: bool = True
+    return_value: bool = True,
 ) -> List:
     """Input validation against a list.
 
