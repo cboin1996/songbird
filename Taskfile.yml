@@ -15,6 +15,22 @@ tasks:
     sources:
       - venv
 
+  volumesinit:
+    prefix: volumesinit
+    desc: creates data folders for docker app
+    cmds:
+      - mkdir -p app/data/dump
+      - mkdir -p app/data/local_chromium
+      - mkdir -p app/data/gdrive
+
+  volumesclean:
+    prefix: volumesclean
+    cmds:
+     - rm -rf ./app/data/dump
+     - rm -rf ./app/data/local_chromium
+     - rm -rf ./app/data/gdrive
+
+    desc: cleans up data folders
   install-deps:
     prefix: install-deps
     cmds:
@@ -51,17 +67,6 @@ tasks:
       - '{{.APP_ROOT}}/*/**'
       - Dockerfile
 
-  dev-cpu:
-    prefix: dev
-    desc: runs the app for cpu only (use -w flag for live rebuilds)
-    cmds:
-      - task: clean
-      - task: build
-      - task: run-cpu
-    sources:
-      - '{{.APP_ROOT}}/**'
-      - '{{.APP_ROOT}}/*/**'
-      - Dockerfile
 
   lint:
     prefix: lint

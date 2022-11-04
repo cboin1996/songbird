@@ -8,3 +8,6 @@ pydub==0.25.1
 ffprobe-python==1.0.3
 mutagen==1.46.0
 pydantic==1.10.2
+google-api-python-client==2.65.0
+google-auth-httplib2==0.1.0
+google-auth-oauthlib==0.7.1

@@ -8,10 +8,37 @@ from config import settings
 from models import modes, itunes_api
 import itunes
 import youtube
+import gdrive
 import web
 import shutil
 
 logger = logging.getLogger(__name__)
+
+def validate_essentials(config: settings.SongbirdConfig):
+    success = True
+    if config.gdrive_enabled:
+        if not os.path.exists(config.get_gdrive_folder_path()):
+            logger.error(f"You must create the path {config.get_gdrive_folder_path()} \
+             to use google drive feature! If using docker, use bind mounts. See README for more info.")
+            success =  False
+        if not os.path.exists(os.path.join(config.get_gdrive_folder_path(), "credentials.json")):
+            logger.error(f"You must provide a credentials.json file inside of {config.get_gdrive_folder_path()} to use gdrive feature!")
+            success =  False
+
+    if config.itunes_enabled:
+        if not os.path.exists(config.get_itunes_folder_path()):
+            logger.error(f"You must create the path {config.get_itunes_folder_path()} \
+             to use itunes feature! If using docker, use bind mounts. See README for more info.")
+            success =  False
+
+        if not os.path.exists(config.get_itunes_lib_path()):
+            logger.error(f"You must create the path {config.get_itunes_lib_path()} \
+             to use itunes feature! If using docker, use bind mounts. See README for more info.")
+            success =  False
+
+    if not os.path.exists(config.get_data_path()):
+        logger.error(f"At minimum, you need path {config.get_data_path()} configured to run the app. If using docker, use bind mounts. See README.")
+    return success
 
 def initialize_dirs(dirs: List[str]):
     """Initialize the apps directories
@@ -21,6 +48,7 @@ def initialize_dirs(dirs: List[str]):
     """
     for _dir in dirs:
         if not os.path.exists(_dir):
+            logger.info(f"Creating dir: {_dir}")
             os.mkdir(_dir)
 
 def resolve_mode(
@@ -96,7 +124,8 @@ def run_for_song(
     downloaded_file_path = None
     # make sure file doesnt already exist
     if os.path.exists(file_path):
-        file_path += f"{file_path_no_format}_duped{file_format}"
+        file_path_no_format += "_duped"
+        file_path = f"{file_path_no_format}.{file_format}"
     # run the youtube downloader
     if config.youtube_dl_enabled:
         payload = config.youtube_searchform_payload
@@ -133,7 +162,7 @@ def run_for_song(
         inp = common.get_input(save_prompt_base+" itunes (i), or locally (l)", out_type=str, choices=["i", "l"])
 
     if not config.itunes_enabled and config.gdrive_enabled:
-        inp = common.get_input(save_prompt_base+" gdrive (g), or locally (l)", out_type=str, choices=["i", "l"])
+        inp = common.get_input(save_prompt_base+" gdrive (g), or locally (l)", out_type=str, choices=["g", "l"])
 
     if not config.itunes_enabled and not config.gdrive_enabled:
         inp = "l"
@@ -146,7 +175,11 @@ def run_for_song(
         shutil.move(downloaded_file_path, config.get_itunes_folder_path())
     elif inp == "g":
         msg = "Saved to gdrive"
-        shutil.move(downloaded_file_path, config.get_gdrive_folder_path())
+        path = shutil.move(downloaded_file_path, config.get_gdrive_folder_path())
+        gdrive.save_song(config.gdrive_folder_id,
+            credentials_path=os.path.join(config.get_gdrive_folder_path(), "credentials.json"),
+            token_path = os.path.join(config.get_gdrive_folder_path(), "token.json"),
+            song_name=song_name, song_path=str(path))
     else:
         msg = "Saved locally."
 
@@ -160,11 +193,13 @@ def run(config: settings.SongbirdConfig):
         # via bind mounts
         if config.run_local:
             initialize_dirs([
-                config.get_data_path(),
-                config.get_itunes_folder_path(),
-                config.get_gdrive_folder_path(),
-                config.get_local_folder_path()
+                    config.get_data_path(),
+                    config.get_itunes_folder_path(),
+                    config.get_gdrive_folder_path(),
+                    config.get_local_folder_path()
             ])
+        if not validate_essentials(config):
+            return None
         current_mode = modes.Modes.SONG
         session = None
         while True:

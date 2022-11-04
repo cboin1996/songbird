@@ -87,8 +87,8 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
 
         str_list = inp.split(sep)
         typed_list = []
-        type_check_passed = True
         for item in str_list:
+            type_check_passed = True
             try:
                 typed_inp = out_type(item)
             except ValueError as e:
@@ -96,10 +96,10 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
                     f"Invalid input {inp} recieved, expected list with types: {out_type}, separated by '{sep}'"
                 )
                 type_check_passed = False
-        if not type_check_passed:
-            continue
+            if not type_check_passed:
+                continue
 
-        typed_list.append(out_type(item))
+            typed_list.append(out_type(item))
         return typed_list
 
 
@@ -218,6 +218,10 @@ def select_items_from_list(
         )
         if inp is None:
             return None
+        print(inp)
+        if len(inp) == 0:
+            logger.info("You selected nothing.")
+            return []
         # verify if the value of the input is the selection value
         if inp[0] == no_selection_value:
             return []
