@@ -5,3 +5,5 @@ venv
 .task
 .env
 data
+credentials.json
+token.json

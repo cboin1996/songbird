@@ -5,17 +5,15 @@ RUN apt-get update && apt-get install -y \
   git \
   python3.10 \
   python3-pip \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && pip install --upgrade pip
 
-RUN pip install --upgrade pip
 
-RUN useradd --create-home appuser
-USER appuser
 WORKDIR /app
+COPY app/requirements.txt .
+ENV PATH="/root/.local/bin:${PATH}"
+RUN pip install -r requirements.txt
+COPY app .
 
-COPY --chown=appuser:appuser app/requirements.txt requirements.txt
-RUN pip install --user -r requirements.txt
 
-ENV PATH="/home/worker/.local/bin:${PATH}"
-COPY --chown=appuser:appuser app .
 ENTRYPOINT ["python3", "main.py"]

@@ -17,6 +17,7 @@ class ItunesApiSongModel(BaseModel):
     releaseDate: str
     releaseDateKey: str = "releaseDate"
 
+
 class ItunesApiAlbumKeys(BaseModel):
     artistName: str
     collectionName: str

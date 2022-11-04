@@ -191,6 +191,7 @@ def parse_itunes_search_api(
 
     return user_selection[0]
 
+
 def convert_mp3_to_itunes_format(input_filename):
     """Convert the mp3 file to itunes format, updating tags to the new itunes standard.
     Args:
@@ -203,6 +204,7 @@ def convert_mp3_to_itunes_format(input_filename):
     output_filename = input_filename.replace(".mp3", ".m4a")
     song_file.export(output_filename, format="ipod")
     return output_filename
+
 
 def remove_songs_selected(song_properties_list):
     common.pretty_list_of_basemodel_printer(song_properties_list)
@@ -321,6 +323,7 @@ def query_api(
 
     return parsed_results_list
 
+
 def artwork_searcher(url):
     """Album artwork searcher.
 
@@ -330,20 +333,28 @@ def artwork_searcher(url):
     Returns:
         requests.Response: the response for the artwork request
     """
-    artwork_size_list = ['100x100', '500x500', '1000x1000', '1500x1500', '2000x2000', '2500x2500', '3000x3000']
+    artwork_size_list = [
+        "100x100",
+        "500x500",
+        "1000x1000",
+        "1500x1500",
+        "2000x2000",
+        "2500x2500",
+        "3000x3000",
+    ]
     i = len(artwork_size_list) - 1
 
-    response = requests.get(url.replace('100x100', artwork_size_list[i]))
+    response = requests.get(url.replace("100x100", artwork_size_list[i]))
     while response.status_code != 200 and i != 0:
-        logger.info(f'- Size not found -- Trying size: {artwork_size_list[i]}')
-        response = requests.get(url.replace('100x100', artwork_size_list[i]))
+        logger.info(f"- Size not found -- Trying size: {artwork_size_list[i]}")
+        response = requests.get(url.replace("100x100", artwork_size_list[i]))
         i -= 1
 
     if i == 0:
-        logger.info('Couldnt find album art. Your file wont have the art.')
+        logger.info("Couldnt find album art. Your file wont have the art.")
         return None
 
     else:
-        logger.info(f'Found art at size: {artwork_size_list[i]}')
+        logger.info(f"Found art at size: {artwork_size_list[i]}")
 
     return response

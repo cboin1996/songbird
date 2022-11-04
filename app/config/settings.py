@@ -22,6 +22,7 @@ class SongbirdConfig(BaseSettings):
     itunes_lib_path: Optional[str] = "ituneslib"
     gdrive_enabled: bool = True
     gdrive_folder_path: Optional[str] = "gdrive"
+    gdrive_folder_id: Optional[str] = ""
     local_song_store_str: str = "dump"
     youtube_dl_enabled = True
     youtube_home_url = "https://www.youtube.com"
@@ -29,7 +30,6 @@ class SongbirdConfig(BaseSettings):
     youtube_search_tag = "search_query"
     youtube_searchform_payload = {youtube_search_tag: ""}
     youtube_dl_retries = 3
-
 
     class Config:
         config_path = os.path.join(os.path.dirname(sys.path[0]), ".env")
@@ -43,7 +43,7 @@ class SongbirdConfig(BaseSettings):
         return os.path.join(self.get_data_path(), self.local_song_store_str)
 
     def get_itunes_folder_path(self):
-        """If you run the app locally, configure the gdrive path as an absolute path. Otherwise, the program will
+        """If you run the app locally, configure the itunes path as an absolute path. Otherwise, the program will
         use the local container storage and assume to be running in a docker container.
 
         Returns:
@@ -52,6 +52,17 @@ class SongbirdConfig(BaseSettings):
         if self.run_local:
             return itunes_folder_path
         return os.path.join(self.get_data_path(), self.itunes_folder_path)
+
+    def get_itunes_lib_path(self):
+        """If you run the app locally, configure the itunes path as an absolute path. Otherwise, the program will
+        use the local container storage and assume to be running in a docker container.
+
+        Returns:
+            str: the path to where itunes destined songs should live
+        """
+        if self.run_local:
+            return itunes_lib_path
+        return os.path.join(self.get_data_path(), self.itunes_lib_path)
 
     def get_gdrive_folder_path(self):
         if self.run_local:

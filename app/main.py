@@ -8,10 +8,51 @@ from config import settings
 from models import modes, itunes_api
 import itunes
 import youtube
+import gdrive
 import web
 import shutil
 
 logger = logging.getLogger(__name__)
+
+
+def validate_essentials(config: settings.SongbirdConfig):
+    success = True
+    if config.gdrive_enabled:
+        if not os.path.exists(config.get_gdrive_folder_path()):
+            logger.error(
+                f"You must create the path {config.get_gdrive_folder_path()} \
+             to use google drive feature! If using docker, use bind mounts. See README for more info."
+            )
+            success = False
+        if not os.path.exists(
+            os.path.join(config.get_gdrive_folder_path(), "credentials.json")
+        ):
+            logger.error(
+                f"You must provide a credentials.json file inside of {config.get_gdrive_folder_path()} to use gdrive feature!"
+            )
+            success = False
+
+    if config.itunes_enabled:
+        if not os.path.exists(config.get_itunes_folder_path()):
+            logger.error(
+                f"You must create the path {config.get_itunes_folder_path()} \
+             to use itunes feature! If using docker, use bind mounts. See README for more info."
+            )
+            success = False
+
+        if not os.path.exists(config.get_itunes_lib_path()):
+            logger.error(
+                f"You must create the path {config.get_itunes_lib_path()} \
+             to use itunes feature! If using docker, use bind mounts. See README for more info."
+            )
+            success = False
+
+    if not os.path.exists(config.get_data_path()):
+        logger.error(
+            f"At minimum, you need path {config.get_data_path()} configured to run the app. If using docker, use bind mounts. See README."
+        )
+    return success
+
 
 def initialize_dirs(dirs: List[str]):
     """Initialize the apps directories
@@ -21,7 +62,9 @@ def initialize_dirs(dirs: List[str]):
     """
     for _dir in dirs:
         if not os.path.exists(_dir):
+            logger.info(f"Creating dir: {_dir}")
             os.mkdir(_dir)
+
 
 def resolve_mode(
     inp: str, current_mode: modes.Modes = modes.Modes.SONG
@@ -50,7 +93,7 @@ def run_for_song(
     config: settings.SongbirdConfig,
     song_name: str,
     song_properties: Optional[itunes_api.ItunesApiSongModel],
-    session: Optional[web.SimpleSession]
+    session: Optional[web.SimpleSession],
 ):
     """Run a cycle of the application given a song.
 
@@ -91,17 +134,20 @@ def run_for_song(
 
     if song_properties is None:
         return
-    file_path_no_format= os.path.join(config.get_local_folder_path(), song_name)
-    file_path= file_path_no_format+"."+file_format
+    file_path_no_format = os.path.join(config.get_local_folder_path(), song_name)
+    file_path = file_path_no_format + "." + file_format
     downloaded_file_path = None
     # make sure file doesnt already exist
     if os.path.exists(file_path):
-        file_path += f"{file_path_no_format}_duped{file_format}"
+        file_path_no_format += "_duped"
+        file_path = f"{file_path_no_format}.{file_format}"
     # run the youtube downloader
     if config.youtube_dl_enabled:
         payload = config.youtube_searchform_payload
         if song_properties != []:
-            payload[config.youtube_search_tag] = f"{song_properties.artistName} {song_properties.trackName}"
+            payload[
+                config.youtube_search_tag
+            ] = f"{song_properties.artistName} {song_properties.trackName}"
         else:
             payload[config.youtube_search_tag] = song_name
 
@@ -111,7 +157,8 @@ def run_for_song(
             youtube_home_url=config.youtube_home_url,
             youtube_search_url=config.youtube_search_url,
             youtube_query_payload=payload,
-            file_format=file_format)
+            file_format=file_format,
+        )
 
     if downloaded_file_path is None:
         return
@@ -122,18 +169,32 @@ def run_for_song(
     elif file_format == "m4a":
         tag_successful = itunes.m4a_tagger(downloaded_file_path, song_properties)
     else:
-        logger.warn("You've specified a file format that is has no tagger supported yet. Saving file without tags.")
+        logger.warn(
+            "You've specified a file format that is has no tagger supported yet. Saving file without tags."
+        )
 
     # provide user with choices for where to save their file to.
     save_prompt_base = "Would you like to save your file to"
     if config.itunes_enabled and config.gdrive_enabled:
-        inp = common.get_input(save_prompt_base+" gdrive (g), itunes (i), or locally (l)", out_type=str, choices=["g", "i", "l"])
+        inp = common.get_input(
+            save_prompt_base + " gdrive (g), itunes (i), or locally (l)",
+            out_type=str,
+            choices=["g", "i", "l"],
+        )
 
     if config.itunes_enabled and not config.gdrive_enabled:
-        inp = common.get_input(save_prompt_base+" itunes (i), or locally (l)", out_type=str, choices=["i", "l"])
+        inp = common.get_input(
+            save_prompt_base + " itunes (i), or locally (l)",
+            out_type=str,
+            choices=["i", "l"],
+        )
 
     if not config.itunes_enabled and config.gdrive_enabled:
-        inp = common.get_input(save_prompt_base+" gdrive (g), or locally (l)", out_type=str, choices=["i", "l"])
+        inp = common.get_input(
+            save_prompt_base + " gdrive (g), or locally (l)",
+            out_type=str,
+            choices=["g", "l"],
+        )
 
     if not config.itunes_enabled and not config.gdrive_enabled:
         inp = "l"
@@ -146,11 +207,21 @@ def run_for_song(
         shutil.move(downloaded_file_path, config.get_itunes_folder_path())
     elif inp == "g":
         msg = "Saved to gdrive"
-        shutil.move(downloaded_file_path, config.get_gdrive_folder_path())
+        path = shutil.move(downloaded_file_path, config.get_gdrive_folder_path())
+        gdrive.save_song(
+            config.gdrive_folder_id,
+            credentials_path=os.path.join(
+                config.get_gdrive_folder_path(), "credentials.json"
+            ),
+            token_path=os.path.join(config.get_gdrive_folder_path(), "token.json"),
+            song_name=song_name,
+            song_path=str(path),
+        )
     else:
         msg = "Saved locally."
 
     logger.info(msg)
+
 
 def run(config: settings.SongbirdConfig):
     try:
@@ -159,18 +230,24 @@ def run(config: settings.SongbirdConfig):
         # only need folders on OS if we are running locally. Otherwise user is expected to provied folders
         # via bind mounts
         if config.run_local:
-            initialize_dirs([
-                config.get_data_path(),
-                config.get_itunes_folder_path(),
-                config.get_gdrive_folder_path(),
-                config.get_local_folder_path()
-            ])
+            initialize_dirs(
+                [
+                    config.get_data_path(),
+                    config.get_itunes_folder_path(),
+                    config.get_gdrive_folder_path(),
+                    config.get_local_folder_path(),
+                ]
+            )
+        if not validate_essentials(config):
+            return None
         current_mode = modes.Modes.SONG
         session = None
         while True:
             if config.youtube_dl_enabled:
                 if session is None:
-                    session =  web.SimpleSession("youtube", root_url=config.youtube_home_url)
+                    session = web.SimpleSession(
+                        "youtube", root_url=config.youtube_home_url
+                    )
 
             logger.info("---Songbird Main Menu---")
             song_properties = None
@@ -215,7 +292,6 @@ def run(config: settings.SongbirdConfig):
     logger.info("Shutting down!")
     session.close()
 
+
 if __name__ == "__main__":
     run(config=settings.SongbirdConfig())
-
-
