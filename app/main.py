@@ -139,8 +139,10 @@ def run_for_song(
     downloaded_file_path = None
     # make sure file doesnt already exist
     if os.path.exists(file_path):
-        file_path_no_format += "_duped"
+        logger.warning(f"Duplicate file found: {file_path}")
+        file_path_no_format += "_dup"
         file_path = f"{file_path_no_format}.{file_format}"
+        logger.warning(f"Renamed this dl to {file_path}")
     # run the youtube downloader
     if config.youtube_dl_enabled:
         payload = config.youtube_searchform_payload
@@ -216,6 +218,7 @@ def run_for_song(
             token_path=os.path.join(config.get_gdrive_folder_path(), "token.json"),
             song_name=song_name,
             song_path=str(path),
+            auth_port=config.gdrive_auth_port
         )
     else:
         msg = "Saved locally."

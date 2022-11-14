@@ -23,6 +23,7 @@ class SongbirdConfig(BaseSettings):
     gdrive_enabled: bool = True
     gdrive_folder_path: Optional[str] = "gdrive"
     gdrive_folder_id: Optional[str] = ""
+    gdrive_auth_port: int = 8080
     local_song_store_str: str = "dump"
     youtube_dl_enabled = True
     youtube_home_url = "https://www.youtube.com"
