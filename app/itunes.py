@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def itunes_lib_search(
     itunes_lib_path: str,
     search_parameters: str,
-    album_properties=Optional[itunes_api.ItunesApiAlbumKeys],
+    album_properties: Optional[itunes_api.ItunesApiAlbumKeys] = None,
 ) -> List[str]:
     """
     Performs a search on users iTunes library by album, artist and genre
@@ -27,21 +27,23 @@ def itunes_lib_search(
         album_properties (itunes_api.ItunesApiAlbumKeys): determines whether to do a smarter search based on given album properties
     Returns: iTunesPaths dict with songs matching the search added
     """
-    itunes_songs = glob.glob(itunes_lib_path, recursive=True)
+    itunes_songs = glob.glob(
+        os.path.join(itunes_lib_path, "*", "*", f"*.*"), recursive=True
+    )
     matches = []
     for song_path in itunes_songs:
         # song_name_split is list of itunes file path.. artist is -3 from length, song is -1
         song_name_split = song_path.split(os.sep)
-        song_name = remove_illegal_characters(
+        song_name = common.remove_illegal_characters(
             song_name_split[len(song_name_split) - 1].lower()
         )
-        album_name = remove_illegal_characters(
+        album_name = common.remove_illegal_characters(
             song_name_split[len(song_name_split) - 2].lower()
         )
-        artist_name = remove_illegal_characters(
+        artist_name = common.remove_illegal_characters(
             song_name_split[len(song_name_split) - 3].lower()
         )
-        search_parameters = remove_illegal_characters(search_parameters.lower())
+        search_parameters = common.remove_illegal_characters(search_parameters.lower())
         if album_properties == None:
             formatted_name = song_name + " " + album_name + " " + artist_name
             if search_parameters in formatted_name:

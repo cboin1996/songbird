@@ -17,6 +17,7 @@ def save_song(
     token_path: str,
     song_name: str,
     song_path: str,
+    auth_port: int,
 ):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
@@ -31,7 +32,7 @@ def save_song(
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(credentials_path, scopes)
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_local_server(port=auth_port)
         # Save the credentials for the next run
         with open(token_path, "w") as token:
             token.write(creds.to_json())

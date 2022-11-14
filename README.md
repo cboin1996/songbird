@@ -56,9 +56,9 @@ the `credentials.json` file at the `app/data/gdrive` folder at the root of the p
 
 ```bash
 docker run -it --env-file .env \
--v "${PWD}"app/data/dump:/app/data/dump \
--v "${PWD}"app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
--v "${PWD}"app/data/gdrive:/app/data/gdrive \
+-v "${PWD}"/app/data/dump:/app/data/dump \
+-v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+-v "${PWD}"/app/data/gdrive:/app/data/gdrive \
 cboin/songbird:v0.0.0
 ```
 
@@ -71,10 +71,10 @@ ITUNES_ENABLED=True
 
 ```bash
 docker run -it --env-file .env \
--v "${PWD}"app/data/dump:/app/data/dump \
--v "${PWD}"app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
--v "${PWD}"path/to/itunesautoadd:/app/data/itunesauto \
--v "${PWD}"path/to/ituneslib:/app/data/ituneslib \
+-v "${PWD}"/app/data/dump:/app/data/dump \
+-v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+-v "${PWD}"/path/to/itunesautoadd:/app/data/itunesauto \
+-v "${PWD}"/path/to/ituneslib:/app/data/ituneslib \
 cboin/songbird:v0.0.0
 ```
 
