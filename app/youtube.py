@@ -55,7 +55,7 @@ def get_video_links(
     video_selection_idx = common.select_items_from_list(
         "Select the song you wish to download!", link_list, 1, return_value=False
     )
-    if len(video_selection_idx) == 0 or video_selection_idx is None:
+    if video_selection_idx is None or len(video_selection_idx) == 0:
         return None
 
     video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
