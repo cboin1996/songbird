@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def itunes_lib_search(
     itunes_lib_path: str,
     search_parameters: str,
-    album_properties: Optional[itunes_api.ItunesApiAlbumKeys]=None
+    album_properties: Optional[itunes_api.ItunesApiAlbumKeys] = None,
 ) -> List[str]:
     """
     Performs a search on users iTunes library by album, artist and genre
@@ -27,7 +27,9 @@ def itunes_lib_search(
         album_properties (itunes_api.ItunesApiAlbumKeys): determines whether to do a smarter search based on given album properties
     Returns: iTunesPaths dict with songs matching the search added
     """
-    itunes_songs = glob.glob(os.path.join(itunes_lib_path, "*", "*", f"*.*"), recursive=True)
+    itunes_songs = glob.glob(
+        os.path.join(itunes_lib_path, "*", "*", f"*.*"), recursive=True
+    )
     matches = []
     for song_path in itunes_songs:
         # song_name_split is list of itunes file path.. artist is -3 from length, song is -1

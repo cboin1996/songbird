@@ -17,12 +17,14 @@ def get_video_links(
     youtube_home_url: str,
     youtube_search_url: str,
     youtube_query_payload: dict,
-    render_timeout: int
+    render_timeout: int,
 ):
 
     # First, enter the search form on the youtube home page
     response = session.enter_search_form(
-        search_url=youtube_search_url, payload=youtube_query_payload, render_timeout=render_timeout
+        search_url=youtube_search_url,
+        payload=youtube_query_payload,
+        render_timeout=render_timeout,
     )
     if response == None:
         logger.error(
@@ -144,7 +146,7 @@ def run_download_process(
     youtube_search_url: str,
     youtube_query_payload: dict,
     file_format: str,
-    render_timeout: int
+    render_timeout: int,
 ) -> str:
     """Download a song from youtube.
 
@@ -160,7 +162,11 @@ def run_download_process(
     """
     # obtain video selection from user
     video_url = get_video_links(
-        session, youtube_home_url, youtube_search_url, youtube_query_payload, render_timeout
+        session,
+        youtube_home_url,
+        youtube_search_url,
+        youtube_query_payload,
+        render_timeout,
     )
     if video_url is None:
         return

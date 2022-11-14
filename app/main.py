@@ -160,7 +160,7 @@ def run_for_song(
             youtube_search_url=config.youtube_search_url,
             youtube_query_payload=payload,
             file_format=file_format,
-            render_timeout=config.youtube_render_timeout
+            render_timeout=config.youtube_render_timeout,
         )
 
     if downloaded_file_path is None:
@@ -219,7 +219,7 @@ def run_for_song(
             token_path=os.path.join(config.get_gdrive_folder_path(), "token.json"),
             song_name=song_name,
             song_path=str(path),
-            auth_port=config.gdrive_auth_port
+            auth_port=config.gdrive_auth_port,
         )
     else:
         msg = "Saved locally."
