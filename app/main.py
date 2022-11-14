@@ -119,7 +119,7 @@ def run_for_song(
         )
     # if any of the above, ask user if they want to download anyways
     files = file_local + file_itunes + file_gdrive
-    if len(file_local) > 0:
+    if len(files) > 0:
         logger.info("Found the following similar files:")
         common.pretty_lst_printer(files)
         inp = common.get_input(
@@ -160,6 +160,7 @@ def run_for_song(
             youtube_search_url=config.youtube_search_url,
             youtube_query_payload=payload,
             file_format=file_format,
+            render_timeout=config.youtube_render_timeout
         )
 
     if downloaded_file_path is None:
