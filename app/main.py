@@ -141,7 +141,9 @@ def run_for_song(
     if duped_filepath is None:
         return
     if duped_filepath != file_path:
-        logger.warning(f"Duplicate file(s) already exist for base file {file_path}, so I generated a new filename {duped_filepath}!")
+        logger.warning(
+            f"Duplicate file(s) already exist for base file {file_path}, so I generated a new filename {duped_filepath}!"
+        )
         file_path_no_format = os.path.splitext(duped_filepath)[0]
         file_path = duped_filepath
     # run the youtube downloader
@@ -161,7 +163,7 @@ def run_for_song(
             youtube_query_payload=payload,
             file_format=file_format,
             render_timeout=config.youtube_render_timeout,
-            render_wait=config.youtube_render_wait
+            render_wait=config.youtube_render_wait,
         )
 
     if downloaded_file_path is None:
@@ -208,13 +210,27 @@ def run_for_song(
 
     if inp == "i":
         msg = "Saved to itunes"
-        itunes_dest_path = common.fname_duper(os.path.join(config.get_itunes_folder_path(), os.path.basename(downloaded_file_path)), config.fname_dup_limit, 1, config.fname_dup_key)
+        itunes_dest_path = common.fname_duper(
+            os.path.join(
+                config.get_itunes_folder_path(), os.path.basename(downloaded_file_path)
+            ),
+            config.fname_dup_limit,
+            1,
+            config.fname_dup_key,
+        )
         if itunes_dest_path is None:
             return None
         shutil.move(downloaded_file_path, itunes_dest_path)
     elif inp == "g":
         msg = "Saved to gdrive"
-        gdrive_dest_path = common.fname_duper(os.path.join(config.get_gdrive_folder_path(), os.path.basename(downloaded_file_path)), config.fname_dup_limit, 1, config.fname_dup_key)
+        gdrive_dest_path = common.fname_duper(
+            os.path.join(
+                config.get_gdrive_folder_path(), os.path.basename(downloaded_file_path)
+            ),
+            config.fname_dup_limit,
+            1,
+            config.fname_dup_key,
+        )
         if gdrive_dest_path is None:
             return None
         shutil.move(downloaded_file_path, gdrive_dest_path)
@@ -232,7 +248,7 @@ def run_for_song(
             song_name=song_name,
             song_path=str(gdrive_dest_path),
             auth_port=config.gdrive_auth_port,
-            bind_addr=bind_addr
+            bind_addr=bind_addr,
         )
     else:
         msg = "Saved locally."
@@ -312,6 +328,7 @@ def run(config: settings.SongbirdConfig):
         logger.info("\nReceived keyboard interrupt :o")
 
     logger.info("Shutting down!")
+
 
 if __name__ == "__main__":
     run(config=settings.SongbirdConfig())

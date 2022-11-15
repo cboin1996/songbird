@@ -37,6 +37,7 @@ def name_plate():
         f"At the main menu, type of of {[mode.value for mode in modes.Modes]} to switch modes!"
     )
 
+
 def fname_duper(fname: str, limit: int, count: int, dup_key: str):
     """Generates a duplicate filename for when a filename already exists
 
@@ -53,12 +54,15 @@ def fname_duper(fname: str, limit: int, count: int, dup_key: str):
     fname_noext = fname_split[0]
     ext = fname_split[1]
     if count == limit:
-        logger.error(f"Max retry limit {limit} reached for fname {fname}. Please try changing some filenames and try again later.")
+        logger.error(
+            f"Max retry limit {limit} reached for fname {fname}. Please try changing some filenames and try again later."
+        )
         return None
     if os.path.exists(fname):
-        fname = fname_duper(fname_noext+dup_key+ext, limit, count+1, dup_key)
+        fname = fname_duper(fname_noext + dup_key + ext, limit, count + 1, dup_key)
 
     return fname
+
 
 def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] = None):
     while True:
@@ -75,7 +79,9 @@ def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] 
                 typed = out_type(inp)
 
             except ValueError as e:
-                logger.error("Invalid type received. Try again, inputting an '{out_type}'")
+                logger.error(
+                    "Invalid type received. Try again, inputting an '{out_type}'"
+                )
         else:
             typed = inp
 
@@ -86,8 +92,6 @@ def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] 
             logger.error(f"You must input one of {choices}")
         else:
             return typed
-
-
 
 
 def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[int]:

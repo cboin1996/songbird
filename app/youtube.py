@@ -18,16 +18,13 @@ def get_video_links(
     youtube_query_payload: dict,
     render_timeout: int,
     render_wait: int,
-    retry_count: Optional[int] = 3
+    retry_count: Optional[int] = 3,
 ):
     headers = {
-        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36", # ubuntu chrome headers
-        "referrer": youtube_home_url
-
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",  # ubuntu chrome headers
+        "referrer": youtube_home_url,
     }
-    session = web.SimpleSession(
-        "youtube", root_url=youtube_home_url, headers=headers
-    )
+    session = web.SimpleSession("youtube", root_url=youtube_home_url, headers=headers)
     tries = 0
     while tries < retry_count:
         # First, enter the search form on the youtube home page
@@ -51,7 +48,9 @@ def get_video_links(
         else:
             break
     if tries >= retry_count:
-        logger.error(f"Failed to get links from {youtube_home_url} after {retry_count} tries.")
+        logger.error(
+            f"Failed to get links from {youtube_home_url} after {retry_count} tries."
+        )
         return None
 
     link_list = []
@@ -162,7 +161,7 @@ def run_download_process(
     youtube_query_payload: dict,
     file_format: str,
     render_timeout: int,
-    render_wait: int
+    render_wait: int,
 ) -> str:
     """Download a song from youtube.
 
@@ -182,7 +181,7 @@ def run_download_process(
         youtube_search_url,
         youtube_query_payload,
         render_timeout,
-        render_wait
+        render_wait,
     )
     if video_url is None:
         return

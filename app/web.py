@@ -18,7 +18,7 @@ class SimpleSession:
         self.credentials = {}
         self.headers = headers
         if headers is None:
-            self.headers = { # default header is generic old mac
+            self.headers = {  # default header is generic old mac
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Safari/605.1.15"
             }
         self.current_url = ""
@@ -64,7 +64,7 @@ class SimpleSession:
         form_url: Optional[str] = None,
         payload: Optional[dict] = None,
         render_timeout: Optional[int] = 10,
-        render_wait: Optional[int] = 2
+        render_wait: Optional[int] = 2,
     ):
         """
         Enter into a search form for a website

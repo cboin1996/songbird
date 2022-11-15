@@ -215,7 +215,7 @@ def remove_songs_selected(song_properties_list):
         input_string,
         song_properties_list,
         n_choices=len(song_properties_list) - 1,
-        sep = " ",
+        sep=" ",
         opposite=True,
         no_selection_value=-1,
     )

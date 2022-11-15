@@ -8,6 +8,7 @@ from googleapiclient import http
 
 import logging
 from typing import Optional
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,7 +19,7 @@ def save_song(
     song_name: str,
     song_path: str,
     auth_port: int,
-    bind_addr: Optional[str] = None
+    bind_addr: Optional[str] = None,
 ):
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
