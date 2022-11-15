@@ -31,10 +31,12 @@ tasks:
      - rm -rf ./app/data/gdrive
 
     desc: cleans up data folders
+
   install-deps:
     prefix: install-deps
+    desc: setup  the dependencies for the app
     cmds:
-      - pip install black isort
+      - pip install black isort click
       - pip install -r {{.APP_ROOT}}/requirements.txt
 
   build:
