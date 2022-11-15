@@ -8,6 +8,9 @@ You will require:
 1. docker: https://docs.docker.com/get-docker/
 
 ## Run
+Note, to be gung-ho, add `--pull always` to any of the below commands to always receive the latest
+and greatest immages.
+
 First, initialize your docker volumes
 
 ```bash
@@ -24,7 +27,7 @@ docker run -it \
 -v "${PWD}"/path/to/ituneslib:/app/data/ituneslib \
 -p 8080:8080 \
 --hostname songbird \
-cboin/songbird:v0.0.0
+cboin/songbird:latest
 ```
 
 If using itunes, make sure to replace the following from the above command.
@@ -69,7 +72,7 @@ docker run -it --env-file .env \
 -v "${PWD}"/app/data/gdrive:/app/data/gdrive \
 -p 8080:8080 \
 --hostname songbird \
-cboin/songbird:v0.0.0
+cboin/songbird:latest
 ```
 
 # To enable only itunes
@@ -85,7 +88,7 @@ docker run -it --env-file .env \
 -v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
 -v "${PWD}"/path/to/itunesautoadd:/app/data/itunesauto \
 -v "${PWD}"/path/to/ituneslib:/app/data/ituneslib \
-cboin/songbird:v0.0.0
+cboin/songbird:latest
 ```
 If using itunes, make sure to replace the following from the above command.
 - replace `path/to/itunesautoadd`:
