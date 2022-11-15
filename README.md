@@ -9,7 +9,7 @@ You will require:
 
 ## Run
 Note, to be gung-ho, add `--pull always` to any of the below commands to always receive the latest
-and greatest immages.
+and greatest images.
 
 First, initialize your docker volumes
 
