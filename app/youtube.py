@@ -32,7 +32,7 @@ def get_video_links(
             search_url=youtube_search_url,
             payload=youtube_query_payload,
             render_timeout=render_timeout,
-            render_wait=render_wait
+            render_wait=render_wait,
         )
         if response == None:
             logger.error(
