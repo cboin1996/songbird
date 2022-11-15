@@ -4,6 +4,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  release:
+    types: [published]
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -45,6 +47,6 @@ jobs:
         run: |
           docker buildx build --platform ${{ steps.prepare.outputs.docker_platform_amd64 }} -t ${{ steps.prepare.outputs.docker_image }}:${{steps.prepare.outputs.version}} -t ${{ steps.prepare.outputs.docker_image }}:latest --file ./Dockerfile -o type=image,push=false .
       - name: Run Buildx (push image)
-        if: success()  && github.event_name == 'push' # trigger a build and push to docker registry
+        if: success()  && github.event_name == 'push' || github.event_name == 'release' # trigger a build and push to docker registry
         run: |
           docker buildx build --platform ${{ steps.prepare.outputs.docker_platform_amd64 }} -t ${{ steps.prepare.outputs.docker_image }}:${{steps.prepare.outputs.version}} -t ${{ steps.prepare.outputs.docker_image }}:latest --file ./Dockerfile -o type=image,push=true .
