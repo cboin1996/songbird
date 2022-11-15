@@ -15,7 +15,7 @@ class SongbirdConfig(BaseSettings):
 
     run_local: bool = False
     root_path: str = sys.path[0]
-    data_path = "data"
+    data_path: str = "data"
     itunes_search_api_base_url: str = "https://itunes.apple.com/search"
     itunes_enabled: bool = True
     itunes_folder_path: Optional[str] = "itunesauto"
@@ -25,13 +25,17 @@ class SongbirdConfig(BaseSettings):
     gdrive_folder_id: Optional[str] = ""
     gdrive_auth_port: int = 8080
     local_song_store_str: str = "dump"
-    youtube_dl_enabled = True
-    youtube_render_timeout = 20
-    youtube_home_url = "https://www.youtube.com"
-    youtube_search_url = "https://www.youtube.com/results"
-    youtube_search_tag = "search_query"
-    youtube_searchform_payload = {youtube_search_tag: ""}
-    youtube_dl_retries = 3
+    fname_dup_key: str = "_dup"
+    fname_dup_limit: str = 8
+    youtube_dl_enabled: bool = True
+    youtube_render_timeout: int = 20
+    youtube_render_wait: int = 2
+    youtube_home_url: str = "https://www.youtube.com"
+    youtube_search_url: str = "https://www.youtube.com/results"
+    youtube_search_tag: str = "search_query"
+    youtube_searchform_payload: dict = {youtube_search_tag: ""}
+    youtube_dl_retries: int = 3
+    file_format: str = "mp3"
 
     class Config:
         config_path = os.path.join(os.path.dirname(sys.path[0]), ".env")
