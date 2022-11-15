@@ -87,10 +87,16 @@ class SimpleSession:
                 f"Exception occurred while performing GET request to {search_url},\n\t with code {response.status_code},\n\t body {response.content}"
             )
             return None
-        logger.info("Rendering html for : " + response.url)
-        response.html.render(timeout=render_timeout, wait=render_wait)
-        logger.info("Rendering complete for : " + response.url)
 
+        try:
+            logger.info("Rendering html for : " + response.url)
+            response.html.render(timeout=render_timeout, wait=render_wait)
+            logger.info("Rendering complete for : " + response.url)
+        except Exception as e:
+            logger.exception(
+                f"Exception occurred while rendering {response.url}!"
+            )
+            return None
         return response
 
     def close(self):

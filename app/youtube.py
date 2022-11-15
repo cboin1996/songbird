@@ -48,6 +48,7 @@ def get_video_links(
             tries += 1
         else:
             break
+    session.close()
     if tries >= retry_count:
         logger.error(
             f"Failed to get links from {youtube_home_url} after {retry_count} tries."
