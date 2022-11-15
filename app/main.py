@@ -275,18 +275,6 @@ def run(config: settings.SongbirdConfig):
             return None
         current_mode = modes.Modes.SONG
         while True:
-            if config.youtube_dl_enabled:
-                if session is None:
-                    headers = {
-                        "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:106.0) Gecko/20100101 Firefox/106.0",
-                        "Referer": "https://www.youtube.com/",
-                        "Accept": "image/avif,image/webp,*/*",
-                        "Host": "www.google.com",
-                    }
-                    session = web.SimpleSession(
-                        "youtube", root_url=config.youtube_home_url, headers=headers
-                    )
-
             logger.info("---Songbird Main Menu---")
             song_properties = None
             album_song_properties = None
