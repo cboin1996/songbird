@@ -13,31 +13,46 @@ from yt_dlp.utils import DownloadError, UnavailableVideoError, ExtractorError
 
 
 def get_video_links(
-    session: web.SimpleSession,
     youtube_home_url: str,
     youtube_search_url: str,
     youtube_query_payload: dict,
     render_timeout: int,
+    render_wait: int,
+    retry_count: Optional[int] = 3,
 ):
-
-    # First, enter the search form on the youtube home page
-    response = session.enter_search_form(
-        search_url=youtube_search_url,
-        payload=youtube_query_payload,
-        render_timeout=render_timeout,
-    )
-    if response == None:
+    headers = {
+        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",  # ubuntu chrome headers
+        "referrer": youtube_home_url,
+    }
+    session = web.SimpleSession("youtube", root_url=youtube_home_url, headers=headers)
+    tries = 0
+    while tries < retry_count:
+        # First, enter the search form on the youtube home page
+        response = session.enter_search_form(
+            search_url=youtube_search_url,
+            payload=youtube_query_payload,
+            render_timeout=render_timeout,
+        )
+        if response == None:
+            logger.error(
+                f"Error occurred performing a search for {youtube_query_payload} against url {youtube_search_url}. Please try again."
+            )
+            tries += 1
+        # Get the list of hrefs to each video on the home page
+        links = response.html.find("#video-title")
+        if len(links) == 0:
+            logger.warn(
+                f"Thats odd. Youtube gave me no videos for this search. Attempt {tries+1} of {retry_count}."
+            )
+            tries += 1
+        else:
+            break
+    if tries >= retry_count:
         logger.error(
-            f"Error occurred performing a search for {youtube_query_payload} against url {youtube_search_url}. Please try again."
+            f"Failed to get links from {youtube_home_url} after {retry_count} tries."
         )
         return None
-    # Get the list of hrefs to each video on the home page
-    links = response.html.find("#video-title")
-    if len(links) == 0:
-        logger.warn(
-            f"Thats odd. Youtube gave me no videos for this search. Youll have to try something else: {youtube_query_payload}"
-        )
-        return
+
     link_list = []
     # create a user friendly list, containing videos with title and href refs.
     for idx, link in enumerate(links):
@@ -55,7 +70,7 @@ def get_video_links(
     video_selection_idx = common.select_items_from_list(
         "Select the song you wish to download!", link_list, 1, return_value=False
     )
-    if len(video_selection_idx) == 0 or video_selection_idx is None:
+    if video_selection_idx is None or len(video_selection_idx) == 0:
         return None
 
     video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
@@ -140,13 +155,13 @@ def run_download(url: str, file_path_no_format: str, file_format: str) -> str:
 
 
 def run_download_process(
-    session: web.SimpleSession,
     file_path_no_format: str,
     youtube_home_url: str,
     youtube_search_url: str,
     youtube_query_payload: dict,
     file_format: str,
     render_timeout: int,
+    render_wait: int,
 ) -> str:
     """Download a song from youtube.
 
@@ -162,11 +177,11 @@ def run_download_process(
     """
     # obtain video selection from user
     video_url = get_video_links(
-        session,
         youtube_home_url,
         youtube_search_url,
         youtube_query_payload,
         render_timeout,
+        render_wait,
     )
     if video_url is None:
         return

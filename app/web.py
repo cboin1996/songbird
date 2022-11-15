@@ -16,9 +16,11 @@ class SimpleSession:
         self.name = name
         self.root_url = root_url
         self.credentials = {}
-        self.headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Safari/605.1.15"
-        }
+        self.headers = headers
+        if headers is None:
+            self.headers = {  # default header is generic old mac
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Safari/605.1.15"
+            }
         self.current_url = ""
 
         # initialize a session for this class.. to be used for all requests
@@ -62,6 +64,7 @@ class SimpleSession:
         form_url: Optional[str] = None,
         payload: Optional[dict] = None,
         render_timeout: Optional[int] = 10,
+        render_wait: Optional[int] = 2,
     ):
         """
         Enter into a search form for a website
@@ -85,7 +88,7 @@ class SimpleSession:
             )
             return None
         logger.info("Rendering html for : " + response.url)
-        response.html.render(wait=render_timeout)
+        response.html.render(timeout=render_timeout, wait=2)
         logger.info("Rendering complete for : " + response.url)
 
         return response
