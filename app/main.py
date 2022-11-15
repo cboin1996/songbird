@@ -93,7 +93,6 @@ def run_for_song(
     config: settings.SongbirdConfig,
     song_name: str,
     song_properties: Optional[itunes_api.ItunesApiSongModel],
-    session: Optional[web.SimpleSession],
 ):
     """Run a cycle of the application given a song.
 
@@ -106,7 +105,7 @@ def run_for_song(
     file_itunes = []
     file_gdrive = []
     # itunes craves m4a formatted files. Otherwise we use mp3s, as were civilized people.
-    file_format = "mp3" if not config.itunes_enabled else "m4a"
+    file_format = config.file_format if not config.itunes_enabled else "m4a"
     # check if song exists locally in dump folder
     file_local = common.find_file(config.get_local_folder_path(), f"*{song_name}*")
     # check if song exists locally in itunes
@@ -138,11 +137,13 @@ def run_for_song(
     file_path = file_path_no_format + "." + file_format
     downloaded_file_path = None
     # make sure file doesnt already exist
-    if os.path.exists(file_path):
-        logger.warning(f"Duplicate file found: {file_path}")
-        file_path_no_format += "_dup"
-        file_path = f"{file_path_no_format}.{file_format}"
-        logger.warning(f"Renamed this dl to {file_path}")
+    duped_filepath = common.fname_duper(file_path, config.fname_dup_limit, 1, "_dup")
+    if duped_filepath is None:
+        return
+    if duped_filepath != file_path:
+        logger.warning(f"Duplicate file(s) already exist for base file {file_path}, so I generated a new filename {duped_filepath}!")
+        file_path_no_format = os.path.splitext(duped_filepath)[0]
+        file_path = duped_filepath
     # run the youtube downloader
     if config.youtube_dl_enabled:
         payload = config.youtube_searchform_payload
@@ -154,13 +155,13 @@ def run_for_song(
             payload[config.youtube_search_tag] = song_name
 
         downloaded_file_path = youtube.run_download_process(
-            session=session,
             file_path_no_format=file_path_no_format,
             youtube_home_url=config.youtube_home_url,
             youtube_search_url=config.youtube_search_url,
             youtube_query_payload=payload,
             file_format=file_format,
             render_timeout=config.youtube_render_timeout,
+            render_wait=config.youtube_render_wait
         )
 
     if downloaded_file_path is None:
@@ -207,10 +208,21 @@ def run_for_song(
 
     if inp == "i":
         msg = "Saved to itunes"
-        shutil.move(downloaded_file_path, config.get_itunes_folder_path())
+        itunes_dest_path = common.fname_duper(os.path.join(config.get_itunes_folder_path(), os.path.basename(downloaded_file_path)), config.fname_dup_limit, 1, config.fname_dup_key)
+        if itunes_dest_path is None:
+            return None
+        shutil.move(downloaded_file_path, itunes_dest_path)
     elif inp == "g":
         msg = "Saved to gdrive"
-        path = shutil.move(downloaded_file_path, config.get_gdrive_folder_path())
+        gdrive_dest_path = common.fname_duper(os.path.join(config.get_gdrive_folder_path(), os.path.basename(downloaded_file_path)), config.fname_dup_limit, 1, config.fname_dup_key)
+        if gdrive_dest_path is None:
+            return None
+        shutil.move(downloaded_file_path, gdrive_dest_path)
+        # If running in a container, we need to provide a bind address
+        # Users are expected to run the container with hostname songbird (--hostname songbird)
+        bind_addr = None
+        if not config.run_local:
+            bind_addr = "songbird"
         gdrive.save_song(
             config.gdrive_folder_id,
             credentials_path=os.path.join(
@@ -218,8 +230,9 @@ def run_for_song(
             ),
             token_path=os.path.join(config.get_gdrive_folder_path(), "token.json"),
             song_name=song_name,
-            song_path=str(path),
+            song_path=str(gdrive_dest_path),
             auth_port=config.gdrive_auth_port,
+            bind_addr=bind_addr
         )
     else:
         msg = "Saved locally."
@@ -245,7 +258,6 @@ def run(config: settings.SongbirdConfig):
         if not validate_essentials(config):
             return None
         current_mode = modes.Modes.SONG
-        session = None
         while True:
             if config.youtube_dl_enabled:
                 if session is None:
@@ -295,13 +307,11 @@ def run(config: settings.SongbirdConfig):
             for i, song in enumerate(songs):
                 if album_song_properties is not None:
                     song_properties = album_song_properties[i]
-                success = run_for_song(config, song, song_properties, session)
+                success = run_for_song(config, song, song_properties)
     except KeyboardInterrupt as e:
         logger.info("\nReceived keyboard interrupt :o")
 
     logger.info("Shutting down!")
-    session.close()
-
 
 if __name__ == "__main__":
     run(config=settings.SongbirdConfig())
