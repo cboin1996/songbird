@@ -110,7 +110,7 @@ def run_for_song(
     file_local = common.find_file(config.get_local_folder_path(), f"*{song_name}*")
     # check if song exists locally in itunes
     if config.itunes_enabled:
-        file_itunes = itunes.itunes_lib_search(config.itunes_lib_path, song_name)
+        file_itunes = itunes.itunes_lib_search(config.get_itunes_lib_path(), song_name)
     # check if song exists locally in google drive folder
     if config.gdrive_enabled:
         file_gdrive = common.find_file(
@@ -125,7 +125,7 @@ def run_for_song(
             "Do you want to proceed with download anyway?", choices=["y", "n"]
         )
 
-        if inp == "q" or inp == "n":
+        if inp is None or inp == "n":
             return
 
     if song_properties is None:
