@@ -17,12 +17,12 @@ def get_video_links(
     youtube_search_url: str,
     youtube_query_payload: dict,
     render_timeout: int,
-    render_wait: int,
+    render_wait: float,
     retry_count: Optional[int] = 3,
 ):
     headers = {
-        "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",  # ubuntu chrome headers
-        "referrer": youtube_home_url,
+        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",  # ubuntu chrome headers
+        "Referrer": youtube_home_url,
     }
     session = web.SimpleSession("youtube", root_url=youtube_home_url, headers=headers)
     tries = 0
@@ -162,7 +162,8 @@ def run_download_process(
     youtube_query_payload: dict,
     file_format: str,
     render_timeout: int,
-    render_wait: int,
+    render_wait: float,
+    render_retries: int,
 ) -> str:
     """Download a song from youtube.
 
@@ -183,6 +184,7 @@ def run_download_process(
         youtube_query_payload,
         render_timeout,
         render_wait,
+        render_retries,
     )
     if video_url is None:
         return

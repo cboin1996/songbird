@@ -88,7 +88,7 @@ class SimpleSession:
             )
             return None
         logger.info("Rendering html for : " + response.url)
-        response.html.render(timeout=render_timeout, wait=2)
+        response.html.render(timeout=render_timeout, wait=render_wait)
         logger.info("Rendering complete for : " + response.url)
 
         return response

@@ -164,6 +164,7 @@ def run_for_song(
             file_format=file_format,
             render_timeout=config.youtube_render_timeout,
             render_wait=config.youtube_render_wait,
+            render_retries=config.youtube_render_retries,
         )
 
     if downloaded_file_path is None:
