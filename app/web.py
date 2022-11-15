@@ -93,9 +93,7 @@ class SimpleSession:
             response.html.render(timeout=render_timeout, wait=render_wait)
             logger.info("Rendering complete for : " + response.url)
         except Exception as e:
-            logger.exception(
-                f"Exception occurred while rendering {response.url}!"
-            )
+            logger.exception(f"Exception occurred while rendering {response.url}!")
             return None
         return response
 
