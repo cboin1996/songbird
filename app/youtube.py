@@ -43,7 +43,7 @@ def get_video_links(
         links = response.html.find("#video-title")
         if len(links) == 0:
             logger.warn(
-                f"Thats odd. Youtube gave me no videos for this search. Attempt {tries+1} of {retry_count}."
+                f"{tries+1}:{retry_count}."
             )
             tries += 1
         else:
