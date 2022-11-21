@@ -26,7 +26,9 @@ class SimpleSession:
         # initialize a session for this class.. to be used for all requests
         self.s = HTMLSession()
 
-    def get_form_inputs(self, form_url: str, payload={}):
+    def get_form_inputs(
+        self, form_url: str, payload={}, log_calls: Optional[bool] = True
+    ):
         """Get the inputs for a form on a webpage
 
         Args:
@@ -38,7 +40,8 @@ class SimpleSession:
         form_inputs = {}
 
         form_response = self.s.get(form_url, headers=self.headers)
-        logger.info(f"Loaded web page: {form_response.url}!")
+        if log_calls:
+            logger.info(f"Loaded web page: {form_response.url}!")
         # incase you want to parse through the login page.. see below comment
         inputs = form_response.html.find("input")
 
@@ -55,7 +58,8 @@ class SimpleSession:
             logger.debug("No nonetype attributes to be removed.")
 
         form_inputs.update(payload)
-        logger.info(f"Auto filled the web form with inputs: {form_inputs}")
+        if log_calls:
+            logger.info(f"Auto filled the web form with inputs: {form_inputs}")
         return form_inputs
 
     def enter_search_form(
@@ -65,6 +69,7 @@ class SimpleSession:
         payload: Optional[dict] = None,
         render_timeout: Optional[int] = 10,
         render_wait: Optional[int] = 2,
+        log_calls: Optional[bool] = True,
     ):
         """
         Enter into a search form for a website
@@ -78,7 +83,7 @@ class SimpleSession:
         """
         if form_url is None:
             form_url = self.root_url
-        form_inputs = self.get_form_inputs(form_url, payload)
+        form_inputs = self.get_form_inputs(form_url, payload, log_calls)
         try:
             response = self.s.get(search_url, params=form_inputs, headers=self.headers)
 
