@@ -42,9 +42,7 @@ def get_video_links(
         # Get the list of hrefs to each video on the home page
         links = response.html.find("#video-title")
         if len(links) == 0:
-            logger.warn(
-                f"{tries+1}:{retry_count}."
-            )
+            logger.warn(f"{tries+1}:{retry_count}.")
             tries += 1
         else:
             break
