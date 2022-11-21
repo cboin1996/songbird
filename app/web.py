@@ -1,6 +1,7 @@
 from typing import Optional, List, Dict
 import logging
 from requests_html import HTMLSession
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -38,8 +39,11 @@ class SimpleSession:
         """
         # initialize form_inputs to be empty each request
         form_inputs = {}
-
-        form_response = self.s.get(form_url, headers=self.headers)
+        try:
+            form_response = self.s.get(form_url, headers=self.headers)
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error submitting request to: {form_url}", e)
+            return None
         if log_calls:
             logger.info(f"Loaded web page: {form_response.url}!")
         # incase you want to parse through the login page.. see below comment
@@ -68,7 +72,8 @@ class SimpleSession:
         form_url: Optional[str] = None,
         payload: Optional[dict] = None,
         render_timeout: Optional[int] = 10,
-        render_wait: Optional[int] = 2,
+        render_wait: Optional[int] = 0.2,
+        render_sleep: Optional[int] = 1,
         log_calls: Optional[bool] = True,
     ):
         """
@@ -83,23 +88,22 @@ class SimpleSession:
         """
         if form_url is None:
             form_url = self.root_url
+
         form_inputs = self.get_form_inputs(form_url, payload, log_calls)
+
+        if form_inputs is None:
+            return None
         try:
             response = self.s.get(search_url, params=form_inputs, headers=self.headers)
-
-        except Exception as e:
-            logger.exception(
-                f"Exception occurred while performing GET request to {search_url},\n\t with code {response.status_code},\n\t body {response.content}"
-            )
+        except requests.exceptions.RequestException as e:  # This is the correct syntax
+            logger.error(f"Error submitting request to: {search_url}", e)
             return None
 
-        try:
-            logger.debug("Rendering html for : " + response.url)
-            response.html.render(timeout=render_timeout, wait=render_wait)
-            logger.debug("Rendering complete for : " + response.url)
-        except Exception as e:
-            logger.exception(f"Exception occurred while rendering {response.url}!")
-            return None
+        logger.debug("Rendering html for : " + response.url)
+        response.html.render(
+            timeout=render_timeout, wait=render_wait, sleep=render_sleep
+        )
+        logger.debug("Rendering complete for : " + response.url)
         return response
 
     def close(self):

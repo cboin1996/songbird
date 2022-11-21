@@ -29,7 +29,8 @@ class SongbirdConfig(BaseSettings):
     fname_dup_limit: str = 8
     youtube_dl_enabled: bool = True
     youtube_render_timeout: int = 20
-    youtube_render_wait: float = 2.2
+    youtube_render_wait: float = 0.2
+    youtube_render_sleep: int = 1
     youtube_render_retries: int = 3
     youtube_home_url: str = "https://www.youtube.com"
     youtube_search_url: str = "https://www.youtube.com/results"

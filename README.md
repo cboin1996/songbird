@@ -154,7 +154,8 @@ The following table summarizes the configurable parameters for the app, these ca
 | FNAME_DUP_LIMIT            | str           | 8                                 | The limit of duplicate files matching the `FNAME_DUP_KEY`                  |
 | YOUTUBE_DL_ENABLED         | bool          | True                              | Whether to enable the youtube download feature                             |
 | YOUTUBE_RENDER_TIMEOUT     | int           | 20                                | The time before giving up on the render of youtube's search page           |
-| YOUTUBE_RENDER_WAIT        | int           | 2                                 | The wait time before starting a render of the youtube search page          |
+| YOUTUBE_RENDER_WAIT        | float         | 0.2                               | The wait time before starting a render of the youtube search page          |
+| YOUTUBE_RENDER_SLEEP       | int           | 1                                 | The wait time after initial render of youtube                              |
 | YOUTUBE_HOME_URL           | str           | "https://www.youtube.com"         |                                                                            |
 | YOUTUBE_SEARCH_URL         | str           | "https://www.youtube.com/results" |                                                                            |
 | YOUTUBE_SEARCH_TAG         | str           | "search_query"                    | The html tag on youtubes home page linking to the html search form         |

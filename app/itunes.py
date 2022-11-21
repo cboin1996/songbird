@@ -176,7 +176,10 @@ def parse_itunes_search_api(
     logger.info("Searched for: %s" % (search_variable))
     # Only one item can be selected
     user_selection = common.select_items_from_list(
-        "Select the number for the properties you want", parsed_results_list, 1
+        "Select the number for the properties you want",
+        parsed_results_list,
+        1,
+        no_selection_value=-1,
     )
 
     # user has quit
