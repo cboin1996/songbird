@@ -26,6 +26,8 @@ def get_video_links(
     }
     session = web.SimpleSession("youtube", root_url=youtube_home_url, headers=headers)
     tries = 0
+    # Only need to log info about these requests on first try to simplify UI experience
+    log_attempts = True
     while tries < retry_count:
         # First, enter the search form on the youtube home page
         response = session.enter_search_form(
@@ -33,17 +35,20 @@ def get_video_links(
             payload=youtube_query_payload,
             render_timeout=render_timeout,
             render_wait=render_wait,
+            log_calls=log_attempts,
         )
         if response == None:
             logger.error(
                 f"Error occurred performing a search for {youtube_query_payload} against url {youtube_search_url}. Please try again."
             )
             tries += 1
+            log_attempts = False
         # Get the list of hrefs to each video on the home page
         links = response.html.find("#video-title")
         if len(links) == 0:
             logger.warn(f"{tries+1}:{retry_count}.")
             tries += 1
+            log_attempts = False
         else:
             break
     session.close()

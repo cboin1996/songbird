@@ -109,7 +109,7 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
         Optional[List[int]]: the typed list, or None if user quit
     """
     while True:
-        inp = input(prompt + " ['q' quits]: ")
+        inp = input(prompt + f" ['{quit_str}' quits]: ")
         if inp == quit_str:
             return None
 
@@ -246,7 +246,6 @@ def select_items_from_list(
         )
         if inp is None:
             return None
-        print(inp)
         if len(inp) == 0:
             logger.info("You selected nothing.")
             return []
