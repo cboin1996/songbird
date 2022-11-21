@@ -165,6 +165,7 @@ def run_for_song(
             render_timeout=config.youtube_render_timeout,
             render_wait=config.youtube_render_wait,
             render_retries=config.youtube_render_retries,
+            render_sleep=config.youtube_render_sleep,
         )
 
     if downloaded_file_path is None:
@@ -255,6 +256,7 @@ def run_for_song(
         msg = "Saved locally."
 
     logger.info(msg)
+    return True
 
 
 def run(config: settings.SongbirdConfig):
@@ -292,6 +294,8 @@ def run(config: settings.SongbirdConfig):
                     continue
 
                 album_song_properties = itunes.launch_album_mode(album_name)
+                if album_song_properties is None:
+                    break
                 songs = [song.trackName for song in album_song_properties]
             elif current_mode == modes.Modes.SONG:
                 songs = common.get_input_list(
@@ -313,6 +317,7 @@ def run(config: settings.SongbirdConfig):
                 if album_song_properties is not None:
                     song_properties = album_song_properties[i]
                 success = run_for_song(config, song, song_properties)
+
     except KeyboardInterrupt as e:
         logger.info("\nReceived keyboard interrupt :o")
 

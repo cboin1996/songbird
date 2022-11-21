@@ -19,7 +19,15 @@ def get_video_links(
     render_timeout: int,
     render_wait: float,
     retry_count: Optional[int] = 3,
+    render_sleep: Optional[int] = 1,
 ):
+    """
+    Args:
+        render_timeout (int): amount of time before abandoning a render
+        render_wait (float): the amount of time before attempting a render
+        retry_count (int): the number of retries for a render
+        render_sleep (Optional[int]): the amount of time to wait after rendering
+    """
     headers = {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",  # ubuntu chrome headers
         "Referrer": youtube_home_url,
@@ -35,6 +43,7 @@ def get_video_links(
             payload=youtube_query_payload,
             render_timeout=render_timeout,
             render_wait=render_wait,
+            render_sleep=render_sleep,
             log_calls=log_attempts,
         )
         if response == None:
@@ -43,6 +52,7 @@ def get_video_links(
             )
             tries += 1
             log_attempts = False
+            continue
         # Get the list of hrefs to each video on the home page
         links = response.html.find("#video-title")
         if len(links) == 0:
@@ -73,7 +83,10 @@ def get_video_links(
     common.pretty_lst_printer(link_list)
 
     video_selection_idx = common.select_items_from_list(
-        "Select the song you wish to download!", link_list, 1, return_value=False
+        "Select the song you wish to download!",
+        link_list,
+        1,
+        return_value=False,
     )
     if video_selection_idx is None or len(video_selection_idx) == 0:
         return None
@@ -168,6 +181,7 @@ def run_download_process(
     render_timeout: int,
     render_wait: float,
     render_retries: int,
+    render_sleep: int,
 ) -> str:
     """Download a song from youtube.
 
@@ -176,7 +190,11 @@ def run_download_process(
         youtube_home_url (str): the url to youtube's home page
         youtube_search_url (str): the search url for youtube
         youtube_query_payload (str): the query payload for youtube's search api
-        song_properties (itunes_api.ItunesApiSongModel): Optionally include song properties for a smarter search.
+        file_format (str): desired file format
+        render_timeout (int): amount of time before abandoning a render
+        render_wait (float): the amount of time before attempting a render
+        render_retries (int): the number of retries for a render
+        render_sleep (int): the amount of time to wait after rendering
 
     Returns:
         str: the path on disk that the file was saved to. None if the download fails.
@@ -189,6 +207,7 @@ def run_download_process(
         render_timeout,
         render_wait,
         render_retries,
+        render_sleep,
     )
     if video_url is None:
         return

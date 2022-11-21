@@ -124,11 +124,14 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
                     f"Invalid input {inp} recieved, expected list with types: {out_type}, separated by '{sep}'"
                 )
                 type_check_passed = False
-            if not type_check_passed:
-                continue
+                break
 
             typed_list.append(out_type(item))
-        return typed_list
+
+        # only exit loop if the type check has passed
+        if type_check_passed:
+            break
+    return typed_list
 
 
 def remove_illegal_characters(filename):
@@ -202,7 +205,7 @@ def select_items_from_list(
     sep: Optional[str] = None,
     quit_str: str = "q",
     opposite: bool = False,
-    no_selection_value=-1,
+    no_selection_value=None,
     return_value: bool = True,
 ) -> List:
     """Input validation against a list.
@@ -222,9 +225,9 @@ def select_items_from_list(
     low = 0
     high = len(lyst) - 1
     # provide useful ranges to user
-    if high == 0:
+    if high == -1:
         range_display = ""
-    elif high == 1:
+    elif high == 0:
         range_display = f" (choose {high})"
     else:
         range_display = f" (choose {low} to {high}) "
@@ -234,13 +237,18 @@ def select_items_from_list(
     else:
         opposite_prompt = " continue without selection"
 
+    if no_selection_value is None:
+        no_selection_prompt = ""
+    else:
+        no_selection_prompt = f"[{no_selection_value} {opposite_prompt}]"
+
     while True:
         tries += 1
         if tries > 5:
             logger.info(f"Wtf man. {tries} tries so far? Just get it right!")
         # get user input
         inp = get_input_list(
-            prompt + f"{range_display}[{no_selection_value} {opposite_prompt}]",
+            prompt + f"{range_display} {no_selection_prompt}",
             sep,
             out_type=int,
         )
