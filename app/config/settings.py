@@ -58,7 +58,7 @@ class SongbirdConfig(BaseSettings):
             str: the path to where itunes destined songs should live
         """
         if self.run_local:
-            return itunes_folder_path
+            return self.itunes_folder_path
         return os.path.join(self.get_data_path(), self.itunes_folder_path)
 
     def get_itunes_lib_path(self):
@@ -69,10 +69,8 @@ class SongbirdConfig(BaseSettings):
             str: the path to where itunes destined songs should live
         """
         if self.run_local:
-            return itunes_lib_path
+            return self.itunes_lib_path
         return os.path.join(self.get_data_path(), self.itunes_lib_path)
 
     def get_gdrive_folder_path(self):
-        if self.run_local:
-            return gdrive_folder_path
         return os.path.join(self.get_data_path(), self.gdrive_folder_path)
