@@ -247,7 +247,7 @@ def run_for_song(
                 config.get_gdrive_folder_path(), "credentials.json"
             ),
             token_path=os.path.join(config.get_gdrive_folder_path(), "token.json"),
-            song_name=song_name,
+            song_name=f"{song_name}.{file_format}",
             song_path=str(gdrive_dest_path),
             auth_port=config.gdrive_auth_port,
             bind_addr=bind_addr,
