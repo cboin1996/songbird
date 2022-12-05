@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import pydantic
-from pydantic import BaseModel, BaseSettings
+from pydantic import BaseModel, BaseSettings, Field
 import sys
 
 from models import itunes_api
@@ -13,6 +13,7 @@ from models import itunes_api
 class SongbirdConfig(BaseSettings):
     """Configuration using .env file or defaults declared in here"""
 
+    version: str = ""
     run_local: bool = False
     root_path: str = sys.path[0]
     data_path: str = "data"

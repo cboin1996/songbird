@@ -2,7 +2,7 @@ import logging
 import datetime
 from enum import Enum
 from typing import Optional, List
-import os
+import os, sys
 import common
 from config import settings
 from models import modes, itunes_api
@@ -278,7 +278,8 @@ def run(config: settings.SongbirdConfig):
             return None
         current_mode = modes.Modes.SONG
         while True:
-            logger.info("---Songbird Main Menu---")
+            logger.info(f"---Songbird Main Menu v{config.version}🐦---")
+
             song_properties = None
             album_song_properties = None
             # launch album mode to collect songs
@@ -325,4 +326,7 @@ def run(config: settings.SongbirdConfig):
 
 
 if __name__ == "__main__":
-    run(config=settings.SongbirdConfig())
+    version_path = os.path.join(sys.path[0], "__version__.py")
+    with open(version_path, "r") as f:
+        config = settings.SongbirdConfig(version=f.read().strip().replace('"', ""))
+    run(config=config)

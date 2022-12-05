@@ -31,7 +31,7 @@ def name_plate():
     Returns: operating system
     """
     print("===============================")
-    print("=-----Welcome to songbird-----=")
+    print("=----Welcome to songbird🐦----=")
     print("===============================")
     print(
         f"At the main menu, type of of {[mode.value for mode in modes.Modes]} to switch modes!"
