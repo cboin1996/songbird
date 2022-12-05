@@ -1,6 +1,6 @@
 # songbird
 
-Music downloading client featureing mp3 or m4a tagging.
+Music downloading client featuring mp3 or m4a tagging.
 
 # Installation
 
