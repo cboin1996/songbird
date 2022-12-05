@@ -1,4 +1,4 @@
-# songbird
+# songbird 🐦
 
 Music downloading client featuring mp3 or m4a tagging.
 
