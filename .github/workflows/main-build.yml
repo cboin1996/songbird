@@ -27,7 +27,7 @@ jobs:
             ref="${GITHUB_REF}"
             tag=$(echo $GITHUB_REF | sed 's/refs\/tags\///g')
           fi
-          echo "::set-output name=tag::$tag"
+          echo "name=tag::$tag" >> $GITHUB_OUTPUT
       - name: Set up Docker Buildx
         uses: crazy-max/ghaction-docker-buildx@v1
         with:
@@ -36,10 +36,10 @@ jobs:
         if: success()
         id: prepare
         run: |
-          echo ::set-output name=docker_platform_arm::${DOCKER_TARGET_PLATFORM_ARM}
-          echo ::set-output name=docker_platform_amd64::${DOCKER_TARGET_PLATFORM_x64}
-          echo ::set-output name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}
-          echo ::set-output name=version::${{steps.vars.outputs.tag}}
+          echo "name=docker_platform_arm::${DOCKER_TARGET_PLATFORM_ARM}" >> $GITHUB_OUTPUT
+          echo "name=docker_platform_amd64::${DOCKER_TARGET_PLATFORM_x64}" >> $GITHUB_OUTPUT
+          echo "name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
+          echo "name=version::${{steps.vars.outputs.tag}}" >> $GITHUB_OUTPUT
       - name: Docker Login
         if: success()
         run: |
