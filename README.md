@@ -26,8 +26,8 @@ docker run -it --env-file "${PWD}"/.env \
 -v "${PWD}"/app/data/dump:/app/data/dump \
 -v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
 -v "${PWD}"/app/data/gdrive:/app/data/gdrive \
--v "${PWD}"/path/to/itunesautoadd:/app/data/itunesauto \
--v "${PWD}"/path/to/ituneslib:/app/data/ituneslib \
+-v /path/to/itunesautoadd:/app/data/itunesauto \
+-v /path/to/ituneslib:/app/data/ituneslib \
 -p 8080:8080 \
 --hostname songbird \
 cboin/songbird:latest
@@ -89,8 +89,8 @@ GDRIVE_ENABLED=false
 docker run -it --env-file "${PWD}"/.env \
 -v "${PWD}"/app/data/dump:/app/data/dump \
 -v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
--v "${PWD}"/path/to/itunesautoadd:/app/data/itunesauto \
--v "${PWD}"/path/to/ituneslib:/app/data/ituneslib \
+-v /path/to/itunesautoadd:/app/data/itunesauto \
+-v /path/to/ituneslib:/app/data/ituneslib \
 cboin/songbird:latest
 ```
 If using itunes, make sure to replace the following from the above command.
