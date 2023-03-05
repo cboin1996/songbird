@@ -8,7 +8,7 @@ You will require:
 1. docker: https://docs.docker.com/get-docker/
 
 ## Run
-Note, to be gung-ho, add `--pull always` to any of the below commands to always receive the latest
+Note: to be gung-ho, add `--pull always` to any of the below commands to always receive the latest
 and greatest images.
 
 First, initialize your docker volumes
@@ -17,9 +17,12 @@ First, initialize your docker volumes
 task volumesinit
 ```
 
+Note: For each example below,
+replace `${PWD}` with the absolute path to where songbird is installed.
+
 ### Run with itunes and google drive mode enabled
 ```bash
-docker run -it \
+docker run -it --env-file "${PWD}"/.env \
 -v "${PWD}"/app/data/dump:/app/data/dump \
 -v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
 -v "${PWD}"/app/data/gdrive:/app/data/gdrive \
@@ -66,7 +69,7 @@ Follow https://developers.google.com/drive/api/quickstart/python, and place
 the `credentials.json` file at the `app/data/gdrive` folder at the root of the project.
 
 ```bash
-docker run -it --env-file .env \
+docker run -it --env-file "${PWD}"/.env \
 -v "${PWD}"/app/data/dump:/app/data/dump \
 -v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
 -v "${PWD}"/app/data/gdrive:/app/data/gdrive \
@@ -83,7 +86,7 @@ GDRIVE_ENABLED=false
 ## Run
 
 ```bash
-docker run -it --env-file .env \
+docker run -it --env-file "${PWD}"/.env \
 -v "${PWD}"/app/data/dump:/app/data/dump \
 -v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
 -v "${PWD}"/path/to/itunesautoadd:/app/data/itunesauto \
