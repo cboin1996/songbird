@@ -8,7 +8,9 @@ You will require:
 1. docker: https://docs.docker.com/get-docker/
 
 ## Run
-Note: to be gung-ho, add `--pull always` to any of the below commands to always receive the latest
+
+Note: to be gung-ho, add `--pull always` to any of the
+below commands to always receive the latest
 and greatest images.
 
 First, initialize your docker volumes
@@ -17,35 +19,52 @@ First, initialize your docker volumes
 task volumesinit
 ```
 
-Note: For each example below,
-replace `${PWD}` with the absolute path to where songbird is installed.
+Note: bash or zsh aliases are provided below,
+assuming you clone songbird into your home directory
+into `~/proj/cboin1996/`.
 
 ### Run with itunes and google drive mode enabled
+
+Macos:
+
 ```bash
-docker run -it --env-file "${PWD}"/.env \
--v "${PWD}"/app/data/dump:/app/data/dump \
--v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
--v "${PWD}"/app/data/gdrive:/app/data/gdrive \
--v /path/to/itunesautoadd:/app/data/itunesauto \
--v /path/to/ituneslib:/app/data/ituneslib \
--p 8080:8080 \
---hostname songbird \
-cboin/songbird:latest
+alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+    -v "${HOME}"/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music.localized:/app/data/itunesauto \
+    -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
+	-p 8080:8080 \
+	--hostname songbird \
+	--pull always \
+	cboin/songbird:latest"
 ```
 
-If using itunes, make sure to replace the following from the above command.
-- replace `path/to/itunesautoadd`:
-    - MAC - `/Users/*/Music/iTunes/iTunes Media/Automatically Add to Music.localized`
-    - WINDOWS - `C:\\Users\*\Music\iTunes\iTunes Media\Automatically Add to Itunes`
-- replace `path/to/ituneslib`
-    - MAC - `/Users/*/Music/Itunes/Itunes Media/Music`
-    - WINDOWS - `C:\\Users\*\Music\iTunes\iTunes Media\Music`
+Windows:
+
+Install windows sub-system for linux and setup the below alias:
+
+```bash
+alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+    -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music:/app/data/itunesauto \
+    -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Music:/app/data/ituneslib \
+	-p 8080:8080 \
+	--hostname songbird \
+	--pull always \
+	cboin/songbird:latest"
+```
 
 ### Minimal configuration
-By default, the app assumes itunes is installed. At minimum, create a `.env` file with to run without either.
+By default, the app assumes itunes is installed. At minimum,
+create a `.env` file with to run without either.
 
-In addition, you need a folder to store local files in. This folder will be passed as a volume mount to the
-dockerized app, as above in `-v "app/data/dump":"app/data/dump", and is initialized automatically when running
+In addition, you need a folder to store local files in.
+This folder will be passed as a volume mount to the
+dockerized app, as above in `-v "app/data/dump":"app/data/dump",
+and is initialized automatically when running
 `task volumesinit`.
 
 ```.env
@@ -59,23 +78,26 @@ Create a .env file at the root of the project containing:
 ITUNES_ENABLED=false
 GDRIVE_FOLDER_ID=foo
 ```
-Replace the `foo` with the folder id of your google drive folder. This is found
+Replace the `foo` with the folder id of your google drive
+folder. This is found
 in the url inside the folder when open in googledrive.
 
 `E.x: https://drive.google.com/drive/folders/foo`
 
 
-Follow https://developers.google.com/drive/api/quickstart/python, and place
-the `credentials.json` file at the `app/data/gdrive` folder at the root of the project.
+Follow https://developers.google.com/drive/api/quickstart/python,
+and place the `credentials.json` file at the `app/data/gdrive`
+folder at the root of the project.
 
 ```bash
-docker run -it --env-file "${PWD}"/.env \
--v "${PWD}"/app/data/dump:/app/data/dump \
--v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
--v "${PWD}"/app/data/gdrive:/app/data/gdrive \
--p 8080:8080 \
---hostname songbird \
-cboin/songbird:latest
+alias songbirdg="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+	-p 8080:8080 \
+	--hostname songbird \
+	--pull always \
+	cboin/songbird:latest"
 ```
 
 # To enable only itunes
@@ -85,25 +107,38 @@ GDRIVE_ENABLED=false
 
 ## Run
 
+Macos:
+
 ```bash
-docker run -it --env-file "${PWD}"/.env \
--v "${PWD}"/app/data/dump:/app/data/dump \
--v "${PWD}"/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
--v /path/to/itunesautoadd:/app/data/itunesauto \
--v /path/to/ituneslib:/app/data/ituneslib \
-cboin/songbird:latest
+alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
+        -v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
+        -v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+        -v "${HOME}"/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music.localized:/app/data/itunesauto \
+        -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
+	--pull always \
+        cboin/songbird:latest"
 ```
-If using itunes, make sure to replace the following from the above command.
-- replace `path/to/itunesautoadd`:
-    - MAC - `/Users/*/Music/iTunes/iTunes Media/Automatically Add to Music.localized`
-    - WINDOWS - `C:\\Users\*\Music\iTunes\iTunes Media\Automatically Add to Itunes`
-- replace `path/to/ituneslib`
-    - MAC - `/Users/*/Music/Itunes/Itunes Media/Music`
-    - WINDOWS - `C:\\Users\*\Music\iTunes\iTunes Media\Music`
+
+Windows:
+
+Install windows sub-system for linux and
+setup the below alias:
+
+```bash
+alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
+	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
+    -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music:/app/data/itunesauto \
+    -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Music:/app/data/ituneslib \
+	-p 8080:8080 \
+	--hostname songbird \
+	--pull always \
+	cboin/songbird:latest"
+```
 
 # Dev
 
-To run the application locally, you can use a vscode debugger. You should also setup a .env file
+To run the application locally, you can use a vscode debugger.
+You should also setup a .env file
 with the parameter `RUN_LOCAL=True`.
 
 ## Install requirements
@@ -114,7 +149,8 @@ task install-deps
 ```
 
 ## Run
-Vscode debugger can be configured to run the `main.py` file with the following `.vscode/launch.json` file
+Vscode debugger can be configured to run the `main.py` file
+with the following `.vscode/launch.json` file
 
 ```json
 {
@@ -132,13 +168,19 @@ Vscode debugger can be configured to run the `main.py` file with the following `
 ```
 
 ## Linting
+
 To lint the app, run
+
 ```
 task lint
 ```
 
 # Configuration
-The following table summarizes the configurable parameters for the app, these can be setup in a `.env` file at the root of the project, and passed to docker with `--env-file .env`.
+
+The following table summarizes the configurable parameters for the app,
+these can be setup in a `.env` file at the root of the project,
+and passed to docker with `--env-file .env`.
+
 | Variable                   | Type          | Default                           | Description                                                                |
 | -------------------------- | ------------- | --------------------------------- | -------------------------------------------------------------------------- |
 | RUN_LOCAL                  | bool          | False                             | Whether to run the app locally, or configure it for running in a container |
