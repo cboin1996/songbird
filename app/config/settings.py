@@ -4,7 +4,8 @@ from datetime import datetime
 from typing import List, Optional
 
 import pydantic
-from pydantic import BaseModel, BaseSettings, Field
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
 import sys
 
 from models import itunes_api
@@ -27,7 +28,7 @@ class SongbirdConfig(BaseSettings):
     gdrive_auth_port: int = 8080
     local_song_store_str: str = "dump"
     fname_dup_key: str = "_dup"
-    fname_dup_limit: str = 8
+    fname_dup_limit: int = 8
     youtube_dl_enabled: bool = True
     youtube_render_timeout: int = 20
     youtube_render_wait: float = 0.2
