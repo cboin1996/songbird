@@ -10,7 +10,7 @@ class ItunesApiSongModel(BaseModel):
     primaryGenreName: str
     trackNumber: int
     trackCount: int
-    collectionId: Union[int,str] = ""
+    collectionId: Union[int, str] = ""
     collectionArtistName: str = ""
     discNumber: int
     discCount: int
