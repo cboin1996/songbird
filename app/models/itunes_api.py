@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Union
 
 
 class ItunesApiSongModel(BaseModel):
@@ -10,7 +10,7 @@ class ItunesApiSongModel(BaseModel):
     primaryGenreName: str
     trackNumber: int
     trackCount: int
-    collectionId: int = ""
+    collectionId: Union[int,str] = ""
     collectionArtistName: str = ""
     discNumber: int
     discCount: int
@@ -22,4 +22,4 @@ class ItunesApiAlbumKeys(BaseModel):
     artistName: str
     collectionName: str
     trackCount: int
-    collectionId: str
+    collectionId: Union[int, str] = ""
