@@ -1,11 +1,12 @@
 import logging
 from typing import Optional
-import web
-from models import itunes_api
 import requests_html
 from bs4 import BeautifulSoup
-import common
 import os, sys
+
+from .models import itunes_api
+from . import web
+from . import common
 
 logger = logging.getLogger(__name__)
 import yt_dlp as youtube_dl

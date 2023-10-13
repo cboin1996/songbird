@@ -1,10 +1,22 @@
+# ENV files
 .env
+
+# Vscode
 .vscode
+
+# Python
 __pycache__
 requirements.txt.blank
 venv
+songbird.egg-info
+
+
+# Taskfile
 .task
-.env
+
+# Work directories
 data
+
+# Secrets
 credentials.json
 token.json

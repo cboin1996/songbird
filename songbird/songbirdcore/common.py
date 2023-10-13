@@ -3,10 +3,11 @@ import logging
 import glob
 import os
 
-from models import itunes_api, modes
 from typing import Optional
 import logging
 from pydantic import BaseModel
+
+from .models import itunes_api, modes
 
 logger = logging.getLogger(__name__)
 

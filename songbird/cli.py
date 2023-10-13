@@ -2,20 +2,19 @@ import logging
 import datetime
 from enum import Enum
 from typing import Optional, List
-import os, sys
-import common
+import os, sys, shutil
+
 from config import settings
-from models import modes, itunes_api
-import itunes
-import youtube
-import gdrive
-import web
-import shutil
+from songbirdcore.models import modes, itunes_api
+from songbirdcore import itunes
+from songbirdcore import youtube
+from songbirdcore import gdrive
+from songbirdcore import common
 
 logger = logging.getLogger(__name__)
 
 
-def validate_essentials(config: settings.SongbirdConfig):
+def validate_essentials(config: settings.SongbirdCliConfig):
     success = True
     if config.gdrive_enabled:
         if not os.path.exists(config.get_gdrive_folder_path()):
@@ -90,7 +89,7 @@ def resolve_mode(
 
 
 def run_for_song(
-    config: settings.SongbirdConfig,
+    config: settings.SongbirdCliConfig,
     song_name: str,
     song_properties: Optional[itunes_api.ItunesApiSongModel],
 ):
@@ -259,7 +258,7 @@ def run_for_song(
     return True
 
 
-def run(config: settings.SongbirdConfig):
+def run(config: settings.SongbirdCliConfig):
     try:
         common.set_logger_config_globally()
         common.name_plate()
@@ -328,5 +327,5 @@ def run(config: settings.SongbirdConfig):
 if __name__ == "__main__":
     version_path = os.path.join(sys.path[0], "__version__.py")
     with open(version_path, "r") as f:
-        config = settings.SongbirdConfig(version=f.read().strip().replace('"', ""))
+        config = settings.SongbirdCliConfig(version=f.read().strip().replace('"', ""))
     run(config=config)
