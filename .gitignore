@@ -1,5 +1,5 @@
 # ENV files
-.env
+*.env
 
 # Vscode
 .vscode
@@ -8,13 +8,14 @@
 __pycache__
 requirements.txt.blank
 venv
-songbird.egg-info
+*.egg-info
 
 
 # Taskfile
 .task
 
 # Work directories
+app
 data
 
 # Secrets

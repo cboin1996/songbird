@@ -4,7 +4,8 @@ from enum import Enum
 from typing import Optional, List
 import os, sys, shutil
 
-from config import settings
+import settings
+import version
 from songbirdcore.models import modes, itunes_api
 from songbirdcore import itunes
 from songbirdcore import youtube
@@ -261,7 +262,7 @@ def run_for_song(
 def run(config: settings.SongbirdCliConfig):
     try:
         common.set_logger_config_globally()
-        common.name_plate()
+        common.name_plate(entries=[f"--cli {config.version}"])
         # only need folders on OS if we are running locally. Otherwise user is expected to provied folders
         # via bind mounts
         if config.run_local:
@@ -325,7 +326,5 @@ def run(config: settings.SongbirdCliConfig):
 
 
 if __name__ == "__main__":
-    version_path = os.path.join(sys.path[0], "__version__.py")
-    with open(version_path, "r") as f:
-        config = settings.SongbirdCliConfig(version=f.read().strip().replace('"', ""))
+    config = settings.SongbirdCliConfig(version=version.version)
     run(config=config)

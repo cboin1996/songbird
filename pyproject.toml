@@ -3,11 +3,11 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "songbird"
+name = "songbirdcli"
 authors = [
     {name = "Christian Boin"},
 ]
-version = "0.0.0"
-description = "Music download cli, web interface and general api"
+version = "1.0.0"
+description = "Songbird's cli."
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"

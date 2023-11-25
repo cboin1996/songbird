@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
 import sys
 
+
 class SongbirdCliConfig(BaseSettings):
     """Configuration using .env file or defaults declared in here"""
 
@@ -39,7 +40,8 @@ class SongbirdCliConfig(BaseSettings):
     file_format: str = "mp3"
 
     class Config:
-        config_path = os.path.join(os.path.dirname(sys.path[0]), ".env")
+        env = os.getenv("ENV", "dev")
+        config_path = os.path.join(os.path.dirname(sys.path[0]), f"{env}.env")
         env_file = config_path
         env_file_encoding = "utf-8"
 
@@ -73,6 +75,7 @@ class SongbirdCliConfig(BaseSettings):
 
     def get_gdrive_folder_path(self):
         return os.path.join(self.get_data_path(), self.gdrive_folder_path)
+
 
 class SongbirdServerConfig(BaseSettings):
     """Configuration using .env file or defaults declared in here"""

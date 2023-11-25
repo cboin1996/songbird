@@ -1,14 +1,14 @@
-# songbird 🐦
+# songbirdcli 🐦
 
 Music downloading client featuring mp3 or m4a tagging.
 
 # Installation
 
-You will require:
+To run the app via docker, you will require:
 1. docker: https://docs.docker.com/get-docker/
 
 
-## Command Line Interface
+## Command Line Interface via Docker
 
 Note: to be gung-ho, add `--pull always` to any of the
 below commands to always receive the latest
@@ -29,10 +29,10 @@ into `~/proj/cboin1996/`.
 Macos:
 
 ```bash
-alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
     -v "${HOME}"/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music.localized:/app/data/itunesauto \
     -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
 	-p 8080:8080 \
@@ -46,10 +46,10 @@ Windows:
 Install windows sub-system for linux and setup the below alias:
 
 ```bash
-alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music:/app/data/itunesauto \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Music:/app/data/ituneslib \
 	-p 8080:8080 \
@@ -93,10 +93,10 @@ and place the `credentials.json` file at the `app/data/gdrive`
 folder at the root of the project.
 
 ```bash
-alias songbirdg="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+alias songbirdg="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
 	-p 8080:8080 \
 	--hostname songbird \
 	--pull always \
@@ -114,9 +114,9 @@ GDRIVE_ENABLED=false
 Macos:
 
 ```bash
-alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-        -v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
-        -v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+        -v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
+        -v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
         -v "${HOME}"/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music.localized:/app/data/itunesauto \
         -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
 	--pull always \
@@ -129,8 +129,8 @@ Install windows sub-system for linux and
 setup the below alias:
 
 ```bash
-alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
+alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music:/app/data/itunesauto \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Music:/app/data/ituneslib \
 	-p 8080:8080 \
@@ -147,6 +147,10 @@ with the parameter `RUN_LOCAL=True`.
 
 ### Requirements
 
+First, clone [songbirdcore](https://github.com/cboin1996/songbirdcore.git)
+adjacent to this project.
+
+Next, run
 ```bash
 make setup
 ```
@@ -158,6 +162,13 @@ Next, run:
 ```
 make requirements
 ```
+
+**Note: the above command performs an editable install of `songbirdcore`**
+You can edit songbirdcore directly, and have those changes directly
+integrated with this application when developing.
+To install the official stable version of songbirdcore instead, use
+
+`pip install -U git+https://github.com/cboin1996/songbirdcore@main`
 
 ### Debug CLI
 
@@ -171,34 +182,19 @@ with the following `.vscode/launch.json` file
 			"name": "Python: Current File",
 			"type": "python",
 			"request": "launch",
-			"program": "./app/cli.py",
+			"program": "./songbirdcli/cli.py",
 			"console": "integratedTerminal",
-			"justMyCode": true
+			"justMyCode": true,
+			"envFile": "./dev.env"
 		},
 	]
 }
 ```
 
-### Debug API
+Alternatively, you can simply run the app directly with
 
-Vscode debugger can be configured to the run `server.py` file
-with the following `.vscode/launch.json` configuration:
-
-```json
-{
-	"configurations": [
-		{
-			"name": "Songbird: API",
-			"type": "python",
-			"request": "launch",
-			"module": "uvicorn",
-			"args": ["songbird.server:app", "--reload", "--log-level", "debug"],
-			"jinja": true,
-			"justMyCode": true,
-			"envFile": "${workspaceFolder}/.env"
-		},
-	]
-},
+```bash
+python3 songbirdcli/cli.py
 ```
 
 ## Linting
