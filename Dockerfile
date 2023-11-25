@@ -5,8 +5,7 @@ WORKDIR /app
 # make sure we use the venv
 ENV PATH="/venv/bin:$PATH"
 
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends build-essential gcc git && \
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc git && \
     rm -rf /var/lib/apt/lists/*
 
 # setup venv
@@ -23,8 +22,7 @@ FROM python:3.11-slim as build-image
 ENV PATH="/venv/bin:$PATH"
 
 WORKDIR /app
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends ffmpeg git chromium && \
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg chromium && \
     rm -rf /var/lib/apt/lists/*
 
 # copy venv
