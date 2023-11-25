@@ -1,13 +1,14 @@
-# songbird 🐦
+# songbirdcli 🐦
 
 Music downloading client featuring mp3 or m4a tagging.
 
 # Installation
 
-You will require:
+To run the app via docker, you will require:
 1. docker: https://docs.docker.com/get-docker/
 
-## Run
+
+## Command Line Interface via Docker
 
 Note: to be gung-ho, add `--pull always` to any of the
 below commands to always receive the latest
@@ -16,22 +17,22 @@ and greatest images.
 First, initialize your docker volumes
 
 ```bash
-task volumesinit
+make volumesinit
 ```
 
 Note: bash or zsh aliases are provided below,
 assuming you clone songbird into your home directory
 into `~/proj/cboin1996/`.
 
-### Run with itunes and google drive mode enabled
+### Itunes and Google Drive Integration
 
 Macos:
 
 ```bash
-alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
     -v "${HOME}"/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music.localized:/app/data/itunesauto \
     -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
 	-p 8080:8080 \
@@ -45,10 +46,10 @@ Windows:
 Install windows sub-system for linux and setup the below alias:
 
 ```bash
-alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music:/app/data/itunesauto \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Music:/app/data/ituneslib \
 	-p 8080:8080 \
@@ -58,6 +59,7 @@ alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.e
 ```
 
 ### Minimal configuration
+
 By default, the app assumes itunes is installed. At minimum,
 create a `.env` file with to run without either.
 
@@ -65,14 +67,15 @@ In addition, you need a folder to store local files in.
 This folder will be passed as a volume mount to the
 dockerized app, as above in `-v "app/data/dump":"app/data/dump",
 and is initialized automatically when running
-`task volumesinit`.
+`make volumesinit`.
 
 ```.env
 ITUNES_ENABLED=False
 GDRIVE_ENABLED=False
 ```
 
-### To enable only gdrive
+### Gdrive Only
+
 Create a .env file at the root of the project containing:
 ```.env
 ITUNES_ENABLED=false
@@ -90,17 +93,18 @@ and place the `credentials.json` file at the `app/data/gdrive`
 folder at the root of the project.
 
 ```bash
-alias songbirdg="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/gdrive:/app/data/gdrive \
+alias songbirdg="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
 	-p 8080:8080 \
 	--hostname songbird \
 	--pull always \
 	cboin/songbird:latest"
 ```
 
-# To enable only itunes
+### Itunes Only
+
 ```.env
 GDRIVE_ENABLED=false
 ```
@@ -110,9 +114,9 @@ GDRIVE_ENABLED=false
 Macos:
 
 ```bash
-alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-        -v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
-        -v "${HOME}"/proj/cboin1996/songbird/app/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
+alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+        -v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
+        -v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
         -v "${HOME}"/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music.localized:/app/data/itunesauto \
         -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
 	--pull always \
@@ -125,8 +129,8 @@ Install windows sub-system for linux and
 setup the below alias:
 
 ```bash
-alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.env \
-	-v "${HOME}"/proj/cboin1996/songbird/app/data/dump:/app/data/dump \
+alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
+	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music:/app/data/itunesauto \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Music:/app/data/ituneslib \
 	-p 8080:8080 \
@@ -135,36 +139,62 @@ alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/.e
 	cboin/songbird:latest"
 ```
 
-# Dev
+## Development
 
 To run the application locally, you can use a vscode debugger.
 You should also setup a .env file
 with the parameter `RUN_LOCAL=True`.
 
-## Install requirements
+### Requirements
 
+First, clone [songbirdcore](https://github.com/cboin1996/songbirdcore.git)
+adjacent to this project.
+
+Next, run
 ```bash
-task setup
-task install-deps
+make setup
 ```
 
-## Run
-Vscode debugger can be configured to run the `main.py` file
+Follow the outputted instructions from `make setup`.
+
+Next, run:
+
+```
+make requirements
+```
+
+**Note: the above command performs an editable install of `songbirdcore`**
+You can edit songbirdcore directly, and have those changes directly
+integrated with this application when developing.
+To install the official stable version of songbirdcore instead, use
+
+`pip install -U git+https://github.com/cboin1996/songbirdcore@main`
+
+### Debug CLI
+
+Vscode debugger can be configured to run the `cli.py` file
 with the following `.vscode/launch.json` file
 
 ```json
 {
-  "configurations": [
-    {
-      "name": "Python: Current File",
-      "type": "python",
-      "request": "launch",
-      "program": "./app/main.py",
-      "console": "integratedTerminal",
-      "justMyCode": true
-    },
-  ]
+	"configurations": [
+		{
+			"name": "Python: Current File",
+			"type": "python",
+			"request": "launch",
+			"program": "./songbirdcli/cli.py",
+			"console": "integratedTerminal",
+			"justMyCode": true,
+			"envFile": "./dev.env"
+		},
+	]
 }
+```
+
+Alternatively, you can simply run the app directly with
+
+```bash
+python3 songbirdcli/cli.py
 ```
 
 ## Linting
@@ -172,10 +202,10 @@ with the following `.vscode/launch.json` file
 To lint the app, run
 
 ```
-task lint
+make lint
 ```
 
-# Configuration
+## Configuration
 
 The following table summarizes the configurable parameters for the app,
 these can be setup in a `.env` file at the root of the project,
