@@ -13,6 +13,7 @@ class SongbirdCliConfig(BaseSettings):
     """Configuration using .env file or defaults declared in here"""
 
     version: str = ""
+    log_level: str = "INFO"
     run_local: bool = False
     root_path: str = sys.path[0]
     data_path: str = "data"
