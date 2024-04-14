@@ -118,32 +118,42 @@ def run_download_process(
         str: the path on disk that the file was saved to. None if the download fails.
     """
     # obtain video selection from user
-    link_list, links = youtube.get_video_links(
-        youtube_home_url,
-        youtube_search_url,
-        youtube_query_payload,
-        render_timeout,
-        render_wait,
-        render_retries,
-        render_sleep,
+    video_url = helpers.get_input(
+        prompt=f"Enter a URL, or hit enter to use '{youtube_query_payload}' as a query to youtube: ",
+        out_type=str
     )
-    
-    if link_list is None:
-        return
 
-    # Allow user to select the link they want to download
-    common.pretty_lst_printer(link_list)
-
-    video_selection_idx = helpers.select_items_from_list(
-        "Select the song you wish to download!",
-        link_list,
-        1,
-        return_value=False,
-    )
-    if video_selection_idx is None or len(video_selection_idx) == 0:
+    if video_url is None:
         return None
 
-    video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
+    # empty str (enter) query youtube
+    if video_url == "":
+        link_list, links = youtube.get_video_links(
+            youtube_home_url,
+            youtube_search_url,
+            youtube_query_payload,
+            render_timeout,
+            render_wait,
+            render_retries,
+            render_sleep,
+        )
+        
+        if link_list is None:
+            return
+
+        # Allow user to select the link they want to download
+        common.pretty_lst_printer(link_list)
+
+        video_selection_idx = helpers.select_items_from_list(
+            "Select the song you wish to download!",
+            link_list,
+            1,
+            return_value=False,
+        )
+        if video_selection_idx is None or len(video_selection_idx) == 0:
+            return None
+
+        video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
     # Process the download, and save locally
     return youtube.run_download(video_url, file_path_no_format, file_format)
 
