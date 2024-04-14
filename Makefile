@@ -99,6 +99,7 @@ dev: clean build run
 
 lint:
 	black $(APP_NAME)/.
+	black tests
 
 test:
-	$(ENV_VARS) python -m pytest test/unit -v
+	$(ENV_VARS) python -m pytest tests/unit -v

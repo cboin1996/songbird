@@ -9,6 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def launch_album_mode(artist_album_string=""):
     """
     Args:
@@ -42,6 +43,7 @@ def launch_album_mode(artist_album_string=""):
 
         return songs_in_album_props
 
+
 # entity is usually song for searching songs
 def parse_itunes_search_api(
     search_variable: str, mode: modes.Modes, limit: int = 20, lookup: bool = False
@@ -72,6 +74,8 @@ def parse_itunes_search_api(
         print(" - %s : %s" % (k, v))
 
     return user_selection[0]
+
+
 def remove_songs_selected(song_properties_list):
     common.pretty_list_of_basemodel_printer(song_properties_list)
     input_string = "Enter song id's (1 4 5 etc.) you dont want from this album"
@@ -91,6 +95,7 @@ def remove_songs_selected(song_properties_list):
         return song_properties_list
     # otherwise, user gets the processed list with their items removed
     return user_input
+
 
 def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] = None):
     """Given a prompt, get input from stdio and perform basic type validation
@@ -131,6 +136,7 @@ def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] 
             logger.error(f"You must input one of {choices}")
         else:
             return typed
+
 
 def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[int]:
     """Take an input prompt, and generate a typed list from it, validating against the given input type.

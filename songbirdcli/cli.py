@@ -90,6 +90,7 @@ def resolve_mode(
     except ValueError:
         return None
 
+
 def run_download_process(
     file_path_no_format: str,
     youtube_home_url: str,
@@ -120,7 +121,7 @@ def run_download_process(
     # obtain video selection from user
     video_url = helpers.get_input(
         prompt=f"Enter a URL, or hit enter to use '{youtube_query_payload}' as a query to youtube: ",
-        out_type=str
+        out_type=str,
     )
 
     if video_url is None:
@@ -137,7 +138,7 @@ def run_download_process(
             render_retries,
             render_sleep,
         )
-        
+
         if link_list is None:
             return
 
@@ -156,6 +157,7 @@ def run_download_process(
         video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
     # Process the download, and save locally
     return youtube.run_download(video_url, file_path_no_format, file_format)
+
 
 def run_for_song(
     config: settings.SongbirdCliConfig,
