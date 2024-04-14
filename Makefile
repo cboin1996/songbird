@@ -44,17 +44,25 @@ volumesclean:
 	rm -rf ./$(APP_NAME)/data/gdrive
 
 .PHONY: requirements
+REQUIREMENTS_FILE=requirements.txt
 requirements:
 	pip install black isort click
-	pip install -r $(APP_NAME)/requirements.txt
+	pip install -r $(APP_NAME)/$(REQUIREMENTS_FILE)
+	pip install -e .
 	pip install -e ../songbirdcore
+
+.PHONY: update-requirements
+REQUIREMENTS_FILE=requirements.txt.blank
+update-requirements: requirements
+	rm $(APP_NAME)/requirements.txt
+	pip freeze --exclude-editable > $(APP_NAME)/requirements.txt
 
 .PHONY: build
 build:
 	docker build -t $(APP_NAME):latest .
 
-.PHONY: run/itunes
-run/itunes:
+.PHONY: run-itunes
+run-itunes:
 	docker run -it --env-file docker.env \
         -v "${HOME}"/songbirdcli/data/dump:/app/data/dump \
         -v "${HOME}"/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
@@ -62,8 +70,8 @@ run/itunes:
         -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
 		$(APP_NAME):latest
 
-.PHONY: run/gdrive
-run/gdrive:
+.PHONY: run-gdrive
+run-gdrive:
 	docker run -it --env-file docker.env \
 		-v "${PWD}"/songbirdcli/data/dump:/app/data/dump \
 		-v "${PWD}"/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
@@ -72,8 +80,8 @@ run/gdrive:
 		--hostname songbird \
 		$(APP_NAME):latest
 
-.PHONY: run/default
-run/default:
+.PHONY: run-default
+run-default:
 	docker run -it --env-file docker.env \
 		-v "${PWD}"/songbirdcli/data/dump:/app/data/dump \
 		$(APP_NAME):latest 
