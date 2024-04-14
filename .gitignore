@@ -6,7 +6,6 @@
 
 # Python
 __pycache__
-requirements.txt.blank
 venv
 *.egg-info
 
