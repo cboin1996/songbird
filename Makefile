@@ -102,4 +102,7 @@ lint:
 	black tests
 
 test:
-	$(ENV_VARS) python -m pytest tests/unit -v
+	python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=songbirdcli --cov-report=xml --cov-report=html tests/unit -v
+
+test-env:
+	$(ENV_VARS) python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=songbirdcli --cov-report=xml --cov-report=html tests/unit -v

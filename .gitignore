@@ -16,6 +16,14 @@ venv
 # Work directories
 app
 data
+tests-output
+# pytest junit output
+junit
+
+# code coverage
+coverage.xml
+.coverage
+htmlcov
 
 # Secrets
 credentials.json

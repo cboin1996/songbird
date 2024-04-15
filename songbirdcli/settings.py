@@ -40,7 +40,7 @@ class SongbirdCliConfig(BaseSettings):
     youtube_dl_retries: int = 3
     file_format: str = "mp3"
 
-    class Config:
+    class ConfigDict:
         env = os.getenv("ENV", "dev")
         config_path = os.path.join(os.path.dirname(sys.path[0]), f"{env}.env")
         env_file = config_path
@@ -85,7 +85,7 @@ class SongbirdServerConfig(BaseSettings):
     run_local: bool = False
     root_path: str = sys.path[0]
 
-    class Config:
+    class ConfigDict:
         config_path = os.path.join(os.path.dirname(sys.path[0]), ".env")
         env_file = config_path
         env_file_encoding = "utf-8"

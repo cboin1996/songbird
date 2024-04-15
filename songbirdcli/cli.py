@@ -4,9 +4,9 @@ from enum import Enum
 from typing import Optional, List
 import os, sys, shutil
 
-import settings
-import helpers
-import version
+from songbirdcli import settings
+from songbirdcli import helpers
+from songbirdcli import version
 
 from songbirdcore.models import modes, itunes_api
 from songbirdcore import itunes
