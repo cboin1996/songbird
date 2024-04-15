@@ -46,3 +46,10 @@ COPY pyproject.toml .
 RUN pip install . && playwright install chromium
 
 CMD ["python3", "songbirdcli/cli.py"]
+
+# RUN tests to confirm built code runs as expected
+FROM build-image as test
+
+COPY tests ./tests
+WORKDIR /app
+RUN python3 -m pytest ./tests/unit/

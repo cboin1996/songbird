@@ -1,4 +1,4 @@
 *
-songbirdcli/data/
 !songbirdcli
 !pyproject.toml
+!tests
