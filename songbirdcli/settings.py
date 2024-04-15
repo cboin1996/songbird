@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import pydantic
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from pydantic_settings import BaseSettings
 import sys
 
@@ -13,8 +13,21 @@ class SongbirdCliConfig(BaseSettings):
     """Configuration using .env file or defaults declared in here"""
 
     version: str = ""
+    log_level: str = "INFO"
     run_local: bool = False
+
     root_path: str = sys.path[0]
+
+    @validator("root_path", always=True)
+    def validate_root_path(cls, value, values):
+        # if run_local is true, return the raw value obtained for root_path
+        if values["run_local"]:
+            return value
+        # if run_local is false, assume we are running in docker, and use '/app' as root_path
+        # this preserves back-wards compatible behavior for initial songbird installations
+        else:
+            return os.path.join(os.sep, "app")
+
     data_path: str = "data"
     itunes_search_api_base_url: str = "https://itunes.apple.com/search"
     itunes_enabled: bool = True
@@ -39,7 +52,7 @@ class SongbirdCliConfig(BaseSettings):
     youtube_dl_retries: int = 3
     file_format: str = "mp3"
 
-    class Config:
+    class ConfigDict:
         env = os.getenv("ENV", "dev")
         config_path = os.path.join(os.path.dirname(sys.path[0]), f"{env}.env")
         env_file = config_path
@@ -84,7 +97,7 @@ class SongbirdServerConfig(BaseSettings):
     run_local: bool = False
     root_path: str = sys.path[0]
 
-    class Config:
+    class ConfigDict:
         config_path = os.path.join(os.path.dirname(sys.path[0]), ".env")
         env_file = config_path
         env_file_encoding = "utf-8"

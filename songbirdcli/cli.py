@@ -4,8 +4,10 @@ from enum import Enum
 from typing import Optional, List
 import os, sys, shutil
 
-import settings
-import version
+from songbirdcli import settings
+from songbirdcli import helpers
+from songbirdcli import version
+
 from songbirdcore.models import modes, itunes_api
 from songbirdcore import itunes
 from songbirdcore import youtube
@@ -89,6 +91,74 @@ def resolve_mode(
         return None
 
 
+def run_download_process(
+    file_path_no_format: str,
+    youtube_home_url: str,
+    youtube_search_url: str,
+    youtube_query_payload: dict,
+    file_format: str,
+    render_timeout: int,
+    render_wait: float,
+    render_retries: int,
+    render_sleep: int,
+) -> str:
+    """Download a song from youtube.
+
+    Args:
+        file_name (str): the absolute path of where to save the file
+        youtube_home_url (str): the url to youtube's home page
+        youtube_search_url (str): the search url for youtube
+        youtube_query_payload (str): the query payload for youtube's search api
+        file_format (str): desired file format
+        render_timeout (int): amount of time before abandoning a render
+        render_wait (float): the amount of time before attempting a render
+        render_retries (int): the number of retries for a render
+        render_sleep (int): the amount of time to wait after rendering
+
+    Returns:
+        str: the path on disk that the file was saved to. None if the download fails.
+    """
+    # obtain video selection from user
+    video_url = helpers.get_input(
+        prompt=f"Enter a URL, or hit enter to use '{youtube_query_payload}' as a query to youtube: ",
+        out_type=str,
+    )
+
+    if video_url is None:
+        return None
+
+    # empty str (enter) query youtube
+    if video_url == "":
+        link_list, links = youtube.get_video_links(
+            youtube_home_url,
+            youtube_search_url,
+            youtube_query_payload,
+            render_timeout,
+            render_wait,
+            render_retries,
+            render_sleep,
+        )
+
+        if link_list is None:
+            return
+
+        # Allow user to select the link they want to download
+        common.pretty_lst_printer(link_list)
+
+        video_selection_idx = helpers.select_items_from_list(
+            "Select the song you wish to download!",
+            link_list,
+            1,
+            return_value=False,
+        )
+        if video_selection_idx is None or len(video_selection_idx) == 0:
+            return None
+
+        video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
+    # Process the download, and save locally
+    return youtube.run_download(video_url, file_path_no_format, file_format)
+
+
 def run_for_song(
     config: settings.SongbirdCliConfig,
     song_name: str,
@@ -121,7 +191,7 @@ def run_for_song(
     if len(files) > 0:
         logger.info("Found the following similar files:")
         common.pretty_lst_printer(files)
-        inp = common.get_input(
+        inp = helpers.get_input(
             "Do you want to proceed with download anyway?", choices=["y", "n"]
         )
 
@@ -129,7 +199,7 @@ def run_for_song(
             return
 
     if song_properties is None:
-        song_properties = itunes.parse_itunes_search_api(song_name, modes.Modes.SONG)
+        song_properties = helpers.parse_itunes_search_api(song_name, modes.Modes.SONG)
 
     if song_properties is None:
         return
@@ -150,13 +220,13 @@ def run_for_song(
     if config.youtube_dl_enabled:
         payload = config.youtube_searchform_payload
         if song_properties != []:
-            payload[
-                config.youtube_search_tag
-            ] = f"{song_properties.artistName} {song_properties.trackName}"
+            payload[config.youtube_search_tag] = (
+                f"{song_properties.artistName} {song_properties.trackName}"
+            )
         else:
             payload[config.youtube_search_tag] = song_name
 
-        downloaded_file_path = youtube.run_download_process(
+        downloaded_file_path = run_download_process(
             file_path_no_format=file_path_no_format,
             youtube_home_url=config.youtube_home_url,
             youtube_search_url=config.youtube_search_url,
@@ -184,21 +254,21 @@ def run_for_song(
     # provide user with choices for where to save their file to.
     save_prompt_base = "Would you like to save your file to"
     if config.itunes_enabled and config.gdrive_enabled:
-        inp = common.get_input(
+        inp = helpers.get_input(
             save_prompt_base + " gdrive (g), itunes (i), or locally (l)",
             out_type=str,
             choices=["g", "i", "l"],
         )
 
     if config.itunes_enabled and not config.gdrive_enabled:
-        inp = common.get_input(
+        inp = helpers.get_input(
             save_prompt_base + " itunes (i), or locally (l)",
             out_type=str,
             choices=["i", "l"],
         )
 
     if not config.itunes_enabled and config.gdrive_enabled:
-        inp = common.get_input(
+        inp = helpers.get_input(
             save_prompt_base + " gdrive (g), or locally (l)",
             out_type=str,
             choices=["g", "l"],
@@ -261,7 +331,7 @@ def run_for_song(
 
 def run(config: settings.SongbirdCliConfig):
     try:
-        common.set_logger_config_globally()
+        common.set_logger_config_globally(log_level=config.log_level)
         common.name_plate(entries=[f"--cli {config.version}"])
         # only need folders on OS if we are running locally. Otherwise user is expected to provied folders
         # via bind mounts
@@ -284,7 +354,7 @@ def run(config: settings.SongbirdCliConfig):
             album_song_properties = None
             # launch album mode to collect songs
             if current_mode == modes.Modes.ALBUM:
-                album_name = common.get_input(f"Enter an album name.", out_type=str)
+                album_name = helpers.get_input(f"Enter an album name.", out_type=str)
                 # quit condition
                 if album_name is None:
                     break
@@ -294,12 +364,13 @@ def run(config: settings.SongbirdCliConfig):
                     current_mode = mode
                     continue
 
-                album_song_properties = itunes.launch_album_mode(album_name)
+                album_song_properties = launch_album_mode(album_name)
                 if album_song_properties is None:
                     break
+
                 songs = [song.trackName for song in album_song_properties]
             elif current_mode == modes.Modes.SONG:
-                songs = common.get_input_list(
+                songs = helpers.get_input_list(
                     "Please input song(s), separated by ';'. E.g. song1; song2; song3.",
                     out_type=str,
                     sep="; ",

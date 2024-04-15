@@ -7,7 +7,10 @@ name = "songbirdcli"
 authors = [
     {name = "Christian Boin"},
 ]
-version = "0.1.5"
+version = "0.1.6"
 description = "Songbird's cli."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+exclude = ["app", "junit"]
