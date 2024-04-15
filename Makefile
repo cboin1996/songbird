@@ -50,11 +50,16 @@ requirements:
 	pip install -r $(APP_NAME)/$(REQUIREMENTS_FILE)
 	pip install -e .
 	pip install -e ../songbirdcore
+	pip install -e ../requests-html
+	playwright install
 
 .PHONY: update-requirements
-REQUIREMENTS_FILE=requirements.txt.blank
-update-requirements: requirements
+update-requirements:
 	rm $(APP_NAME)/requirements.txt
+	pip install -r $(APP_NAME)/requirements.txt.blank
+	pip install -e ../songbirdcore
+	pip install -e ../requests-html
+	playwright install
 	pip freeze --exclude-editable > $(APP_NAME)/requirements.txt
 
 .PHONY: build

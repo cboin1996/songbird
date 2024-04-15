@@ -340,6 +340,7 @@ def run(config: settings.SongbirdCliConfig):
                 [
                     config.get_data_path(),
                     config.get_itunes_folder_path(),
+                    config.get_itunes_lib_path(),
                     config.get_gdrive_folder_path(),
                     config.get_local_folder_path(),
                 ]

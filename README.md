@@ -159,16 +159,20 @@ Follow the outputted instructions from `make setup`.
 
 Next, run:
 
-```
+```bash
 make requirements
 ```
 
-**Note: the above command performs an editable install of `songbirdcore`**
-You can edit songbirdcore directly, and have those changes directly
+**Note: the above command performs an editable install of:**
+	- `songbirdcore`
+	- `cboin/requests-html`
+
+You can edit the packages directly from git, and have those changes directly
 integrated with this application when developing.
-To install the official stable version of songbirdcore instead, use
+To install the official stable versions use
 
 `pip install -U git+https://github.com/cboin1996/songbirdcore@main`
+`pip install -U git+https://github.com/cboin1996/requests-html@main`
 
 ### Debug CLI
 

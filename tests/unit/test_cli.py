@@ -20,6 +20,14 @@ def load_config(monkeypatch, request):
         version=version.version,
         root_path=tests_data_folder,
         gdrive_enabled=False,
+        itunes_enabled=True,
+        # we set these paths explicitly so that test
+        # directories are used
+        # in real world scenario, these values
+        # could be set to the actual itunes folders
+        # as long as run_local is true.
+        itunes_lib_path=os.path.join(tests_data_folder, "mock-itunes-lib"),
+        itunes_folder_path=os.path.join(tests_data_folder,"mock-itunes-auto-folder"),
         run_local=True,
     )
     # yield setup to test
@@ -37,12 +45,14 @@ def load_config(monkeypatch, request):
             "0",  # user selects first song
             "",  # user opts to search youtube
             "0",  # user selects first song
+            "i",  # save to local itunes folder
             "q",  # user quits
         ],
         [
             "jolene",  # user enters jolene
             "0",  # user selects first song
             "https://www.youtube.com/watch?v=Ixrje2rXLMA",  # user opts to direct download
+            "l",  # save locally
             "q",  # user quits
         ],
     ],
