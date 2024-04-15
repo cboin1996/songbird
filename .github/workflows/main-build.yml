@@ -18,7 +18,7 @@ jobs:
       DOCKER_TARGET_PLATFORM_ARM: linux/arm64/v8
       DOCKER_PUSH: false
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@v4
       - name: Get Commit or Tag
         id: vars
         run: |
@@ -29,9 +29,7 @@ jobs:
           fi
           echo "TAG=$tag" >> $GITHUB_OUTPUT
       - name: Set up Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@v1
-        with:
-          version: 0.7.1
+        uses: docker/setup-buildx-action@v3
       - name: Prepare
         if: success()
         id: prepare
