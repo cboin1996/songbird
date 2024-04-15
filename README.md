@@ -174,7 +174,7 @@ You can edit the packages directly from git, and have those changes directly
 integrated with this application when developing.
 To install the official stable versions use
 
-`pip install -U git+https://github.com/cboin1996/songbirdcore@main`
+`pip install -U git+https://github.com/cboin1996/songbirdcore@v0.0.4`
 `pip install -U git+https://github.com/cboin1996/requests-html@dev`
 
 ### Debug CLI

@@ -15,7 +15,7 @@ COPY songbirdcli/requirements.txt .
 
 # install dependencies
 RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -U git+https://github.com/cboin1996/songbirdcore@main \
+    pip install --no-cache-dir -U git+https://github.com/cboin1996/songbirdcore@v0.0.4 \
     pip install --no-cache-dir -U git+https://github.com/cboin1996/requests-html@dev
 
 FROM ubuntu:23.04 as build-image
