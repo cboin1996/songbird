@@ -26,7 +26,7 @@ class SongbirdCliConfig(BaseSettings):
         # if run_local is false, assume we are running in docker, and use '/app' as root_path
         # this preserves back-wards compatible behavior for initial songbird installations
         else:
-            return os.path.join(os.sep,"app")
+            return os.path.join(os.sep, "app")
 
     data_path: str = "data"
     itunes_search_api_base_url: str = "https://itunes.apple.com/search"
