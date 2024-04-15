@@ -31,7 +31,6 @@ Macos:
 ```bash
 alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
 	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
 	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
     -v "${HOME}"/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music.localized:/app/data/itunesauto \
     -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
@@ -48,7 +47,6 @@ Install windows sub-system for linux and setup the below alias:
 ```bash
 alias songbirdgi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
 	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
 	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music:/app/data/itunesauto \
     -v /mnt/c/Users/*/Music/iTunes/iTunes\ Media/Music:/app/data/ituneslib \
@@ -95,7 +93,6 @@ folder at the root of the project.
 ```bash
 alias songbirdg="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
 	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
-	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
 	-v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/gdrive:/app/data/gdrive \
 	-p 8080:8080 \
 	--hostname songbird \
@@ -116,7 +113,6 @@ Macos:
 ```bash
 alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/docker.env \
         -v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/dump:/app/data/dump \
-        -v "${HOME}"/proj/cboin1996/songbird/songbirdcli/songbirdcli/data/local_chromium:/root/.local/share/pyppeteer/local-chromium \
         -v "${HOME}"/Music/iTunes/iTunes\ Media/Automatically\ Add\ to\ Music.localized:/app/data/itunesauto \
         -v "${HOME}"/Music/Itunes/Itunes\ Media/Music:/app/data/ituneslib \
 	--pull always \
@@ -147,28 +143,39 @@ with the parameter `RUN_LOCAL=True`.
 
 ### Requirements
 
-First, clone [songbirdcore](https://github.com/cboin1996/songbirdcore.git)
+1. Clone [my fork of requests-html: requests-htmlc](https://github.com/cboin1996/requests-htmlc.git)
+adjacent to this project, and checkout the `dev` branch
+	```bash
+	git checkout dev
+	```
+
+2. Clone [songbirdcore](https://github.com/cboin1996/songbirdcore.git)
 adjacent to this project.
 
-Next, run
-```bash
-make setup
-```
+3. Next, run
 
-Follow the outputted instructions from `make setup`.
+	```bash
+	make setup
+	```
 
-Next, run:
+4. Follow the outputted instructions from `make setup`.
 
-```
-make requirements
-```
+5. Next, run:
 
-**Note: the above command performs an editable install of `songbirdcore`**
-You can edit songbirdcore directly, and have those changes directly
+	```bash
+	make requirements
+	```
+
+**Note: the above command performs an editable install of:**
+	- `songbirdcore`
+	- `cboin/requests-html`
+
+You can edit the packages directly from git, and have those changes directly
 integrated with this application when developing.
-To install the official stable version of songbirdcore instead, use
+To install the official stable versions use
 
 `pip install -U git+https://github.com/cboin1996/songbirdcore@main`
+`pip install -U git+https://github.com/cboin1996/requests-html@dev`
 
 ### Debug CLI
 
