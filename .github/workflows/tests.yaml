@@ -25,7 +25,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r songbirdcli/requirements.txt
           pip install -U git+https://github.com/cboin1996/songbirdcore@main
-          pip install -U git+https://github.com/cboin1996/requests-html@main
+          pip install -U git+https://github.com/cboin1996/requests-html@dev
           playwright install-dep && playwright install
       - name: Test with pytest
         run: |
