@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import pydantic
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, validator
 from pydantic_settings import BaseSettings
 import sys
 
@@ -16,18 +16,17 @@ class SongbirdCliConfig(BaseSettings):
     log_level: str = "INFO"
     run_local: bool = False
 
-    # if running in docker container,
-    # store data starting at root path 'app'
-    # for backwards compat with original
-    # songbirdcli
-    @property
-    def root_path(self):
-        return sys.path[0] if self.run_local else os.path.join(os.sep, "app")
+    root_path: str = sys.path[0]
 
-    @classmethod
-    def define_root_path(cls, v: bool) -> str:
-        if v:
-            return ""
+    @validator("root_path", always=True)
+    def validate_root_path(cls, value, values):
+        # if run_local is true, return the raw value obtained for root_path
+        if values["run_local"]:
+            return value
+        # if run_local is false, assume we are running in docker, and use '/app' as root_path
+        # this preserves back-wards compatible behavior for initial songbird installations
+        else:
+            return os.path.join(os.sep,"app")
 
     data_path: str = "data"
     itunes_search_api_base_url: str = "https://itunes.apple.com/search"
