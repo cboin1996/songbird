@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 
 import pydantic
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings
 import sys
 
@@ -18,10 +18,10 @@ class SongbirdCliConfig(BaseSettings):
 
     root_path: str = sys.path[0]
 
-    @validator("root_path", always=True)
-    def validate_root_path(cls, value, values):
+    @field_validator("root_path")
+    def validate_root_path(cls, value: str, info: ValidationInfo):
         # if run_local is true, return the raw value obtained for root_path
-        if values["run_local"]:
+        if info.data["run_local"]:
             return value
         # if run_local is false, assume we are running in docker, and use '/app' as root_path
         # this preserves back-wards compatible behavior for initial songbird installations
