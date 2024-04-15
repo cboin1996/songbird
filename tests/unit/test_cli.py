@@ -27,7 +27,7 @@ def load_config(monkeypatch, request):
         # could be set to the actual itunes folders
         # as long as run_local is true.
         itunes_lib_path=os.path.join(tests_data_folder, "mock-itunes-lib"),
-        itunes_folder_path=os.path.join(tests_data_folder,"mock-itunes-auto-folder"),
+        itunes_folder_path=os.path.join(tests_data_folder, "mock-itunes-auto-folder"),
         run_local=True,
     )
     # yield setup to test
