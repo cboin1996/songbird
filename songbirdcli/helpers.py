@@ -70,7 +70,7 @@ def parse_itunes_search_api(
         return []
 
     print(f"Selected item: ")
-    for k, v in user_selection[0].dict().items():
+    for k, v in user_selection[0].model_dump().items():
         print(" - %s : %s" % (k, v))
 
     return user_selection[0]
