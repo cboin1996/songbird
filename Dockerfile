@@ -28,8 +28,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg chromium
 # copy venv
 COPY --from=builder /venv /venv
 # copy app contents 
-COPY ./songbirdcli/ ./
+COPY ./songbirdcli/ ./songbirdcli
+COPY pyproject.toml .
+# install package locally
+RUN pip install .
 
 # used for caching chromium across docker runs
 ENV PATH="/root/.local/bin:${PATH}"
-CMD ["python3", "./cli.py"]
+CMD ["python3", "songbirdcli/cli.py"]
