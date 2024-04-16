@@ -2,13 +2,10 @@
 
 Music downloading client featuring mp3 or m4a tagging.
 
-# Installation
+## Install via Docker
 
 To run the app via docker, you will require:
 1. docker: https://docs.docker.com/get-docker/
-
-
-## Command Line Interface via Docker
 
 Note: to be gung-ho, add `--pull always` to any of the
 below commands to always receive the latest
@@ -135,6 +132,16 @@ alias songbirdi="docker run -it --env-file "${HOME}"/proj/cboin1996/songbird/son
 	cboin/songbird:latest"
 ```
 
+## Install as Package
+
+To use songbirdcli as a python package, use
+```bash
+pip install songbirdcli
+```
+
+See [tests](./tests/unit/test_cli.py) for an example
+of configuring and running songbirdcli as a package.
+
 ## Development
 
 To run the application locally, you can use a vscode debugger.
@@ -143,39 +150,34 @@ with the parameter `RUN_LOCAL=True`.
 
 ### Requirements
 
-1. Clone [my fork of requests-html: requests-htmlc](https://github.com/cboin1996/requests-htmlc.git)
-adjacent to this project, and checkout the `dev` branch
-	```bash
-	git checkout dev
-	```
-
-2. Clone [songbirdcore](https://github.com/cboin1996/songbirdcore.git)
+1. Clone [songbirdcore](https://github.com/cboin1996/songbirdcore.git)
 adjacent to this project.
 
-3. Next, run
+2. Next, run
 
 	```bash
+	export ENV=dev
 	make setup
 	```
 
-4. Follow the outputted instructions from `make setup`.
+3. Follow the outputted instructions from `make setup`.
 
-5. Next, run:
+4. Next, run:
 
 	```bash
 	make requirements
 	```
 
-**Note: the above command performs an editable install of:**
-	- `songbirdcore`
-	- `cboin/requests-html`
+**Note: the above command performs an editable install of `songbirdcore`**
 
-You can edit the packages directly from git, and have those changes directly
+This allows you to edit `songbirdcore` locally,
+and have those changes directly
 integrated with this application when developing.
-To install the official stable versions use
+To install the official stable version use
 
-`pip install -U git+https://github.com/cboin1996/songbirdcore@v0.0.4`
-`pip install -U git+https://github.com/cboin1996/requests-html@dev`
+```bash
+pip install songbirdcore
+```
 
 ### Debug CLI
 
