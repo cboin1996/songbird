@@ -12,6 +12,9 @@ description = "Songbird's cli."
 readme = "README.md"
 requires-python = ">=3.11"
 
+[tool.setuptools.dynamic]
+dependencies = {file = ["songbirdcli/requirements.txt"]}
+
 [tool.setuptools.packages.find]
 exclude = ["app", "junit"]
 
