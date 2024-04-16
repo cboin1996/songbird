@@ -1,4 +1,6 @@
 APP_NAME=songbirdcli
+REQUIREMENTS_FILE=requirements.txt
+
 .PHONY: env
 env:
 # check ENV env var has been set
@@ -44,23 +46,25 @@ volumesclean:
 	rm -rf ./$(APP_NAME)/data/gdrive
 
 .PHONY: requirements
-REQUIREMENTS_FILE=requirements.txt
-requirements:
-	pip install black isort click
+requirements: env
 	pip install -r $(APP_NAME)/$(REQUIREMENTS_FILE)
-	pip install -e .
+# only install dependencies locally if in dev env
+ifeq ($(ENV), dev)
+	echo "install dev dependencies"
+	pip install -e .[dev]
 	pip install -e ../songbirdcore
-	pip install -e ../requests-html
+else
+	pip install -e .
+endif
 	playwright install
 
 .PHONY: update-requirements
-update-requirements:
-	rm $(APP_NAME)/requirements.txt
+update-requirements: env
+	pip uninstall songbirdcore
+	pip freeze --exclude-editable | xargs pip uninstall -y
+	rm $(APP_NAME)/$(REQUIREMENTS_FILE) || true
 	pip install -r $(APP_NAME)/requirements.txt.blank
-	pip install -e ../songbirdcore
-	pip install -e ../requests-html
-	playwright install
-	pip freeze --exclude-editable > $(APP_NAME)/requirements.txt
+	pip freeze --exclude-editable > $(APP_NAME)/$(REQUIREMENTS_FILE)
 
 .PHONY: build
 build:
