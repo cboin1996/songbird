@@ -7,10 +7,29 @@ name = "songbirdcli"
 authors = [
     {name = "Christian Boin"},
 ]
-version = "0.1.8"
+version = "0.2.0"
 description = "Songbird's cli."
 readme = "README.md"
 requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["songbirdcli/requirements.txt"]}
+
+[project.optional-dependencies]
+# these dependencies are required for development,
+# not for running the package.
+dev = [
+    "black",
+    "click",
+    "isort",
+    "pytest",
+    "pytest-cov",
+]
+package = [
+    "build",
+    "twine"
+]
 
 [tool.setuptools.packages.find]
 exclude = ["app", "junit"]
