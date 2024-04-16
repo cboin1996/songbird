@@ -14,9 +14,7 @@ RUN python3 -m venv /venv
 COPY songbirdcli/requirements.txt .
 
 # install dependencies
-RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -U git+https://github.com/cboin1996/songbirdcore@v0.0.4 \
-    pip install --no-cache-dir -U git+https://github.com/cboin1996/requests-html@dev
+RUN pip install --no-cache-dir -r requirements.txt
 
 FROM ubuntu:23.04 as build-image
 
@@ -50,6 +48,7 @@ CMD ["python3", "songbirdcli/cli.py"]
 # RUN tests to confirm built code runs as expected
 FROM build-image as test
 
+RUN pip install -e .[dev]
 COPY tests ./tests
 WORKDIR /app
 RUN python3 -m pytest ./tests/unit/

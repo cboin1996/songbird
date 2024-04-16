@@ -11,12 +11,10 @@ version = "0.2.0"
 description = "Songbird's cli."
 readme = "README.md"
 requires-python = ">=3.11"
+dynamic = ["dependencies"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["songbirdcli/requirements.txt"]}
-
-[tool.setuptools.packages.find]
-exclude = ["app", "junit"]
 
 [project.optional-dependencies]
 # these dependencies are required for development,
@@ -32,3 +30,6 @@ package = [
     "build",
     "twine"
 ]
+
+[tool.setuptools.packages.find]
+exclude = ["app", "junit"]
