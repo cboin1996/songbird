@@ -1,0 +1,69 @@
+site_name: songbirdcore
+site_description: music downloading engine at the heart of songbird
+strict: true
+site_url: https://cboin1996.github.io/songbird
+site_dir: public
+
+repo_name: cboin1996/songbird
+repo_url: https://github.com/cboin1996/songbird
+edit_uri: ""
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - toc.follow
+  palette:
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: blue
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    # Palette toggle for light mode
+    - scheme: default
+      primary: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+# https://www.mkdocs.org/user-guide/configuration/#validation
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+
+nav:
+- Get Started:
+  - Welcome to songbirdcore: index.md
+- API Documentation:
+  - songbirdcore:
+    - cli: songbirdcli/cli.md
+    - helpers: songbirdcli/helpers.md
+    - settings: songbirdcli/settings.md
+
+extra:
+  version:
+    provider: mike
+
+plugins:
+- mkdocstrings:
+    enabled: !ENV [ENABLE_MKDOCSTRINGS, true]
+    default_handler: python
+    handlers:
+      python:
+        options:
+          docstring_style: google
+          show_root_heading: true
+          show_root_full_path: true
+          show_root_toc_entry: true
+          docstring_section_style: list
+          show_source: true
+          show_bases: true
+          merge_init_into_class: true
+          show_symbol_type_heading: true
+          show_symbol_type_toc: true

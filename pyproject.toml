@@ -13,6 +13,9 @@ readme = "README.md"
 requires-python = ">=3.11"
 dynamic = ["dependencies"]
 
+[project.urls]
+Documentation = "https://cboin1996.github.io/songbird/"
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["songbirdcli/requirements.txt"]}
 
@@ -20,11 +23,18 @@ dependencies = {file = ["songbirdcli/requirements.txt"]}
 # these dependencies are required for development,
 # not for running the package.
 dev = [
+    # lint
     "black",
     "click",
     "isort",
+    # test
     "pytest",
     "pytest-cov",
+    # docs
+    "mkdocs",
+    "mkdocs-material",
+    "mike",
+    "mkdocstrings-python"
 ]
 package = [
     "build",

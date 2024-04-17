@@ -64,7 +64,7 @@ class SongbirdCliConfig(BaseSettings):
     def get_local_folder_path(self):
         return os.path.join(self.get_data_path(), self.local_song_store_str)
 
-    def get_itunes_folder_path(self):
+    def get_itunes_folder_path(self) -> str:
         """If you run the app locally, configure the itunes path as an absolute path. Otherwise, the program will
         use the local container storage and assume to be running in a docker container.
 
@@ -75,7 +75,7 @@ class SongbirdCliConfig(BaseSettings):
             return self.itunes_folder_path
         return os.path.join(self.get_data_path(), self.itunes_folder_path)
 
-    def get_itunes_lib_path(self):
+    def get_itunes_lib_path(self) -> str:
         """If you run the app locally, configure the itunes path as an absolute path. Otherwise, the program will
         use the local container storage and assume to be running in a docker container.
 
