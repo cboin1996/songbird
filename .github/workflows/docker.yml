@@ -47,9 +47,9 @@ jobs:
           echo "${DOCKER_PASSWORD}" | docker login ${DOCKER_REGISTRY} --username "${DOCKER_USERNAME}" --password-stdin
       - name: Run Buildx
         if: success()  && github.event_name == 'pull_request' # trigger only a build on PR's.
-        # run all targets for buildx
         run: |
           docker buildx build --platform ${{ steps.prepare.outputs.DOCKER_PLATFORM_AMD64 }},${{ steps.prepare.outputs.DOCKER_PLATFORM_ARM }} \
+          --target ${{ steps.prepare.outputs.DOCKER_BUILD_TO_TARGET }} \
           -t ${{ steps.prepare.outputs.DOCKER_IMAGE }}:${{steps.prepare.outputs.VERSION}} \
           -t ${{ steps.prepare.outputs.DOCKER_IMAGE }}:latest \
           --file ./Dockerfile \
