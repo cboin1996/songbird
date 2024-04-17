@@ -344,7 +344,7 @@ def run_for_song(
 
 
 def run(config: settings.SongbirdCliConfig):
-    """main entrypoint for songbirdcli. excpects the songbirdcli config object.
+    """main entrypoint for songbirdcli. Expects the songbirdcli config object.
 
     Args:
         config (settings.SongbirdCliConfig): songbirdcli settings pydantic model
