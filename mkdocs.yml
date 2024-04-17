@@ -1,5 +1,5 @@
-site_name: songbirdcore
-site_description: music downloading engine at the heart of songbird
+site_name: songbirdcli
+site_description: Music Downloading Client Featuring mp3 or m4a Tagging
 strict: true
 site_url: https://cboin1996.github.io/songbird
 site_dir: public
