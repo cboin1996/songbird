@@ -28,3 +28,6 @@ htmlcov
 # Secrets
 credentials.json
 token.json
+
+# mkdocs
+/public

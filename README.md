@@ -142,6 +142,8 @@ pip install songbirdcli
 See [tests](./tests/unit/test_cli.py) for an example
 of configuring and running songbirdcli as a package.
 
+For API documentation, view [here](https://cboin1996.github.io/songbird/)
+
 ## Development
 
 To run the application locally, you can use a vscode debugger.

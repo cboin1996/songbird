@@ -14,10 +14,23 @@ from songbirdcore import youtube
 from songbirdcore import gdrive
 from songbirdcore import common
 
+"""Entrypoint for songbirdcli. Run cli.py as a script to run songbirdcli.
+See the README.md for configuration details.
+"""
+
 logger = logging.getLogger(__name__)
 
 
-def validate_essentials(config: settings.SongbirdCliConfig):
+def validate_essentials(config: settings.SongbirdCliConfig) -> bool:
+    """perform startup validation of the configuration,
+    ensuring pre-conditions are met
+
+    Args:
+        config (settings.SongbirdCliConfig): the songbirdcli pydantic model
+
+    Returns:
+        bool: True if success, False otherwise
+    """
     success = True
     if config.gdrive_enabled:
         if not os.path.exists(config.get_gdrive_folder_path()):
@@ -105,7 +118,7 @@ def run_download_process(
     """Download a song from youtube.
 
     Args:
-        file_name (str): the absolute path of where to save the file
+        file_path_no_format (str): the absolute path of where to save the file (excluding file format)
         youtube_home_url (str): the url to youtube's home page
         youtube_search_url (str): the search url for youtube
         youtube_query_payload (str): the query payload for youtube's search api
@@ -203,6 +216,7 @@ def run_for_song(
 
     if song_properties is None:
         return
+
     file_path_no_format = os.path.join(config.get_local_folder_path(), song_name)
     file_path = file_path_no_format + "." + file_format
     downloaded_file_path = None
@@ -330,6 +344,12 @@ def run_for_song(
 
 
 def run(config: settings.SongbirdCliConfig):
+    """main entrypoint for songbirdcli. Expects the songbirdcli config object.
+
+    Args:
+        config (settings.SongbirdCliConfig): songbirdcli settings pydantic model
+
+    """
     try:
         common.set_logger_config_globally(log_level=config.log_level)
         common.name_plate(entries=[f"--cli {config.version}"])

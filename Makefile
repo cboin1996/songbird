@@ -66,6 +66,22 @@ update-requirements: env
 	pip install -r $(APP_NAME)/requirements.txt.blank
 	pip freeze --exclude-editable > $(APP_NAME)/$(REQUIREMENTS_FILE)
 
+# documentation targets
+.PHONY: docs-lint
+docs-lint:
+	@echo linting files at docs/**/*.md
+	markdownlint docs/**/*.md
+
+.PHONY: docs-serve
+docs-serve:
+	@echo serving the site on http://localhost:8000
+	mkdocs serve
+
+.PHONY: docs-build
+docs-build:
+	@echo building the site
+	mkdocs build --strict --verbose --site-dir public
+
 .PHONY: build
 build:
 	docker build -t $(APP_NAME):latest .

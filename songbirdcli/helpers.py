@@ -2,7 +2,7 @@
 helpers.py module for helping with parsing inputs
 """
 
-from typing import Optional, List
+from typing import Optional, List, Union, Any
 from songbirdcore import common, itunes
 from songbirdcore.models import modes, itunes_api
 import logging
@@ -14,6 +14,7 @@ def launch_album_mode(artist_album_string=""):
     """
     Args:
         artist_album_string (str): the album/artist to search for.
+
     Returns: the list of song properties gathered from the search.
 
     """
@@ -47,7 +48,19 @@ def launch_album_mode(artist_album_string=""):
 # entity is usually song for searching songs
 def parse_itunes_search_api(
     search_variable: str, mode: modes.Modes, limit: int = 20, lookup: bool = False
-) -> itunes_api.ItunesApiSongModel:
+) -> Optional[Union[bool, itunes_api.ItunesApiSongModel]]:
+    """perform a query of the items api, allowing user to select
+    an item from the returned list of options
+
+    Args:
+        search_variable (str): the value for the query
+        mode (modes.Modes): the mode to run
+        limit (int, optional): number of results. Defaults to 20.
+        lookup (bool, optional): whether to enable 'lookup' mode in itunes api. Defaults to False.
+
+    Returns:
+        Optional[Union[itunes_api.ItunesApiSongModel]]: returns the selected song properties, an empty list if the user continues without selection, or None if the user quits or an error occurred.
+    """
     parsed_results_list = itunes.query_api(search_variable, limit, mode, lookup=lookup)
 
     # Present results to user
@@ -67,7 +80,7 @@ def parse_itunes_search_api(
         return
     if len(user_selection) == 0:
         logger.info("Continuing without properties.")
-        return []
+        return True
 
     print(f"Selected item: ")
     for k, v in user_selection[0].model_dump().items():
@@ -76,7 +89,16 @@ def parse_itunes_search_api(
     return user_selection[0]
 
 
-def remove_songs_selected(song_properties_list):
+def remove_songs_selected(song_properties_list) -> Optional[List]:
+    """Given a list of songs properties, allow the user to remove
+    via stdio
+
+    Args:
+        song_properties_list (Any): the list of song properties
+
+    Returns:
+        Optional[List]: the properties list after selection
+    """
     common.pretty_list_of_basemodel_printer(song_properties_list)
     input_string = "Enter song id's (1 4 5 etc.) you dont want from this album"
     user_input = select_items_from_list(
@@ -97,7 +119,9 @@ def remove_songs_selected(song_properties_list):
     return user_input
 
 
-def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] = None):
+def get_input(
+    prompt: str, out_type=None, quit_str="q", choices: Optional[List] = None
+) -> Optional[Any]:
     """Given a prompt, get input from stdio and perform basic type validation
 
     Args:
@@ -107,7 +131,7 @@ def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] 
         choices (Optional[List], optional): valid character options to parse as input. Defaults to None.
 
     Returns:
-        type: the type, or None if quit or invalid type received.
+        Optional[Any]: the typed user input, or None if quit or invalid type received.
     """
     while True:
         built_prompt = prompt
@@ -199,7 +223,9 @@ def select_items_from_list(
         opposite (bool): return everything BUT the user selection
         no_selection_value (any): value to indicate no selection wanted from the user
         return_value (bool): if true, return the value, otherwise return the indicies of selections
-    Returns Optiona[List]: None if user quits, [] if user selects nothing, otherwise a list of the users selections are returned.
+
+    Returns:
+        Optiona[List]: None if user quits, [] if user selects nothing, otherwise a list of the users selections are returned.
     """
     tries = 0
     low = 0
