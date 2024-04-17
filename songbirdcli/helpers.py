@@ -59,7 +59,7 @@ def parse_itunes_search_api(
         lookup (bool, optional): whether to enable 'lookup' mode in itunes api. Defaults to False.
 
     Returns:
-        Optional[Union[itunes_api.ItunesApiSongModel]]: returns the selected song properties, an empty list if the user continues without selection, or None if the user quits or an error occurred.  
+        Optional[Union[itunes_api.ItunesApiSongModel]]: returns the selected song properties, an empty list if the user continues without selection, or None if the user quits or an error occurred.
     """
     parsed_results_list = itunes.query_api(search_variable, limit, mode, lookup=lookup)
 
@@ -90,7 +90,7 @@ def parse_itunes_search_api(
 
 
 def remove_songs_selected(song_properties_list) -> Optional[List]:
-    """Given a list of songs properties, allow the user to remove 
+    """Given a list of songs properties, allow the user to remove
     via stdio
 
     Args:
@@ -119,7 +119,9 @@ def remove_songs_selected(song_properties_list) -> Optional[List]:
     return user_input
 
 
-def get_input(prompt: str, out_type=None, quit_str="q", choices: Optional[List] = None) -> Optional[Any]:
+def get_input(
+    prompt: str, out_type=None, quit_str="q", choices: Optional[List] = None
+) -> Optional[Any]:
     """Given a prompt, get input from stdio and perform basic type validation
 
     Args:
