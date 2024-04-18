@@ -29,6 +29,17 @@ cli_inputs = [
         "l",  # user selects  save locally
         "q",  # user quits
     ],
+    [
+        "john mayer",  # user enters john mayer
+        "",  # user hits enter by accident
+        "0",  # user continues by selecting property 0
+        "",  # user opts to search youtube
+        "",  # user hits enter by accident
+        "800",  # user enters invalid input
+        "0",  # user selects first song
+        "l",  # user selects  save locally
+        "q",  # user quits
+    ],
 ]
 
 
