@@ -388,7 +388,7 @@ def run(config: settings.SongbirdCliConfig):
                     current_mode = mode
                     continue
 
-                album_song_properties = launch_album_mode(album_name)
+                album_song_properties = helpers.launch_album_mode(album_name)
                 if album_song_properties is None:
                     break
 

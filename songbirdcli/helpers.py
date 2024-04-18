@@ -142,6 +142,8 @@ def get_input(
         if inp == quit_str:
             return None
 
+        # initialize type to be empty by default
+        typed = None
         if out_type is not None:
             try:
                 typed = out_type(inp)
@@ -183,8 +185,8 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
 
         str_list = inp.split(sep)
         typed_list = []
-        # by default pass type check
-        type_check_passed = True
+        # by default fail type check
+        type_check_passed = False
         for item in str_list:
             type_check_passed = True
             try:
