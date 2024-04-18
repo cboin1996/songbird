@@ -233,7 +233,8 @@ def run_for_song(
     # run the youtube downloader
     if config.youtube_dl_enabled:
         payload = config.youtube_searchform_payload
-        if song_properties != []:
+        # if song_properties is False, user selected no properties
+        if song_properties != False:
             payload[config.youtube_search_tag] = (
                 f"{song_properties.artistName} {song_properties.trackName}"
             )
@@ -254,16 +255,18 @@ def run_for_song(
 
     if downloaded_file_path is None:
         return
-    # tag file
-    tag_successful = False
-    if file_format == "mp3":
-        tag_successful = itunes.mp3ID3Tagger(downloaded_file_path, song_properties)
-    elif file_format == "m4a":
-        tag_successful = itunes.m4a_tagger(downloaded_file_path, song_properties)
-    else:
-        logger.warn(
-            "You've specified a file format that is has no tagger supported yet. Saving file without tags."
-        )
+
+    if song_properties != False:
+        # tag file if user specified song properties
+        tag_successful = False
+        if file_format == "mp3":
+            tag_successful = itunes.mp3ID3Tagger(downloaded_file_path, song_properties)
+        elif file_format == "m4a":
+            tag_successful = itunes.m4a_tagger(downloaded_file_path, song_properties)
+        else:
+            logger.warning(
+                "You've specified a file format that is has no tagger supported yet. Saving file without tags."
+            )
 
     # provide user with choices for where to save their file to.
     save_prompt_base = "Would you like to save your file to"
