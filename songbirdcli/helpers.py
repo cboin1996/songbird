@@ -59,7 +59,7 @@ def parse_itunes_search_api(
         lookup (bool, optional): whether to enable 'lookup' mode in itunes api. Defaults to False.
 
     Returns:
-        Optional[Union[itunes_api.ItunesApiSongModel]]: returns the selected song properties, an empty list if the user continues without selection, or None if the user quits or an error occurred.
+        Optional[Union[itunes_api.ItunesApiSongModel]]: returns the selected song properties, a bool=False if use continues without selection, or None if the user quits or an error occurred.
     """
     parsed_results_list = itunes.query_api(search_variable, limit, mode, lookup=lookup)
 
@@ -80,7 +80,7 @@ def parse_itunes_search_api(
         return
     if len(user_selection) == 0:
         logger.info("Continuing without properties.")
-        return True
+        return False
 
     print(f"Selected item: ")
     for k, v in user_selection[0].model_dump().items():
@@ -183,6 +183,8 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
 
         str_list = inp.split(sep)
         typed_list = []
+        # by default pass type check
+        type_check_passed = True
         for item in str_list:
             type_check_passed = True
             try:

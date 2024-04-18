@@ -126,8 +126,14 @@ lint:
 	black $(APP_NAME)/.
 	black tests
 
+.PHONY: test-cov
+test-stdout:
+	python -m pytest --cov=songbirdcli tests/unit -v
+
+.PHONY: test
 test:
 	python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=songbirdcli --cov-report=xml --cov-report=html tests/unit -v
 
+.PHONY: test-env
 test-env:
 	$(ENV_VARS) python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=songbirdcli --cov-report=xml --cov-report=html tests/unit -v
