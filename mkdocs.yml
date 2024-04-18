@@ -47,9 +47,9 @@ validation:
 
 nav:
 - Get Started:
-  - Welcome to songbirdcore: index.md
+  - Welcome to songbirdcli: index.md
 - API Documentation:
-  - songbirdcore:
+  - songbirdcli:
     - cli: songbirdcli/cli.md
     - helpers: songbirdcli/helpers.md
     - settings: songbirdcli/settings.md
