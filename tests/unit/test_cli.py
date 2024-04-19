@@ -54,7 +54,6 @@ cli_inputs = [
         "0",  # user selects album 0
         "-1",  # user selects keep all songs
         "-5",  # user enters invalid input
-        "0",  # user selects song property 0 for first song
         "",  # user hits enter to search youtube
         "0",  # user selects song 0
         "l",  # save locally
