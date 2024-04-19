@@ -392,51 +392,71 @@ def run_for_song(
     return True
 
 
+def get_songs_for_album(
+    current_mode: modes.Modes, quit_str: str = "q"
+) -> Optional[Union[List[itunes_api.ItunesApiSongModel], modes.Modes]]:
+    """allow user to search for an album, returning the selected song properties for that album to
+    use by default simplifying the download process
+
+    Args:
+        current_mode (modes.Modes): the mode enum signifying the current mode
+        quit_str (str, optional): _description_. Defaults to "q".
+
+    Returns:
+        Optional[Union[List[itunes_api.ItunesApiSongModel],modes.Modes]]: return None if error, quit_str if user quits, the mode if user selects mode, or the list of album properties
+    """
+    album_name = helpers.get_input(
+        f"Enter an album name.", out_type=str, quit_str=quit_str
+    )
+    # quit condition
+    if album_name == quit_str:
+        return quit_str
+    if album_name is None:
+        return None
+
+    mode = resolve_mode(album_name, current_mode=current_mode)
+    # detect mode change and return to main menu
+    if mode is not None:
+        return mode
+
+    album_song_properties = helpers.launch_album_mode(album_name)
+    # quit iteration to main menu
+    if album_song_properties == quit_str:
+        return quit_str
+    if album_song_properties is None:
+        return None
+
+    return album_song_properties
+
+
 def get_songs_from_user(
     current_mode: modes.Modes, quit_str: str = "q"
 ) -> Optional[Union[str, List[str]]]:
-    # launch album mode to collect songs
-    if current_mode == modes.Modes.ALBUM:
-        album_name = helpers.get_input(
-            f"Enter an album name.", out_type=str, quit_str=quit_str
-        )
-        # quit condition
-        if album_name == quit_str:
-            return quit_str
-        if album_name is None:
-            return None
+    """gather songs from user, validate that the mode wasnt changed
 
-        mode = resolve_mode(album_name, current_mode=current_mode)
-        # detect mode change and return to main menu
-        if mode is not None:
-            return mode
+    Args:
+        current_mode (modes.Modes): the current mode of songbird
+        quit_str (str, optional): allows the user to quit out of this selection. Defaults to "q".
 
-        album_song_properties = helpers.launch_album_mode(album_name)
-        # quit iteration to main menu
-        if album_song_properties == quit_str:
-            return quit_str
-        if album_song_properties is None:
-            return None
-        return [song.trackName for song in album_song_properties]
+    Returns:
+        Optional[Union[str, List[str]]]: None if error occurs, the mode if user changes modes, or a list of song names
+    """
+    songs = helpers.get_input_list(
+        "Please input song(s), separated by ';'. E.g. song1; song2; song3.",
+        out_type=str,
+        sep="; ",
+    )
+    # quit iteration to main menu
+    if songs == quit_str:
+        return quit_str
+    if songs is None:
+        return None
 
-    # launch song mode to collect songs
-    elif current_mode == modes.Modes.SONG:
-        songs = helpers.get_input_list(
-            "Please input song(s), separated by ';'. E.g. song1; song2; song3.",
-            out_type=str,
-            sep="; ",
-        )
-        # quit iteration to main menu
-        if songs == quit_str:
-            return quit_str
-        if songs is None:
-            return None
-
-        mode = resolve_mode(songs[0], current_mode=current_mode)
-        # detect mode change and return to main menu
-        if mode is not None:
-            return mode
-        return songs
+    mode = resolve_mode(songs[0], current_mode=current_mode)
+    # detect mode change and return to main menu
+    if mode is not None:
+        return mode
+    return songs
 
 
 def run(config: settings.SongbirdCliConfig):
@@ -471,7 +491,16 @@ def run(config: settings.SongbirdCliConfig):
 
             song_properties = None
             album_song_properties = None
-            result = get_songs_from_user(current_mode=current_mode, quit_str=quit_str)
+            result = None
+            if current_mode == modes.Modes.ALBUM:
+                result = get_songs_for_album(
+                    current_mode=current_mode, quit_str=quit_str
+                )
+            elif current_mode == modes.Modes.SONG:
+                result = get_songs_from_user(
+                    current_mode=current_mode, quit_str=quit_str
+                )
+
             # user quits
             if result == quit_str:
                 return_to_menu = helpers.get_input(
@@ -495,10 +524,18 @@ def run(config: settings.SongbirdCliConfig):
             # error occurred
             if result is None:
                 continue
-            # set songs to result and continue otherwise
-            songs = result
+
+            # if no errors, and user is in album mode, pre-fill songs
+            # and properties with album values
+            if current_mode == modes.Modes.ALBUM:
+                songs = [song.trackName for song in result]
+                album_song_properties = result
+            elif current_mode == modes.Modes.SONG:
+                songs = result
+
             logger.info(f"Searching for songs: {songs}")
             for i, song in enumerate(songs):
+                # pre-select song properties from album mode if specified
                 if album_song_properties is not None:
                     song_properties = album_song_properties[i]
                 success = run_for_song(config, song, song_properties, quit_str)

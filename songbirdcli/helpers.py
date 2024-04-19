@@ -10,12 +10,17 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def launch_album_mode(artist_album_string="", quit_str="q"):
-    """
-    Args:
-        artist_album_string (str): the album/artist to search for.
+def launch_album_mode(
+    artist_album_string="", quit_str="q"
+) -> Optional[Union[List[itunes_api.ItunesApiSongModel], str]]:
+    """launch album mode: collect album and songs to download
 
-    Returns: the list of song properties gathered from the search, None if error occured, quit_str if user quit
+    Args:
+        artist_album_string (str, optional): the string used when querying itunes api. Defaults to ''.
+        quit_str (str, optional): the str to signify user quitting the process. Defaults to "q".
+
+    Returns:
+        Optional[Union[List[itunes_api.ItunesApiSongModel],str]]: the list of song properties gathered from the search, None if error occured, quit_str if user quit
 
     """
     while True:
