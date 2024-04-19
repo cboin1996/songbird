@@ -5,6 +5,8 @@ from io import StringIO
 import os, sys, shutil
 import pytest
 
+# cli_inputs defined vectors that a user would
+# input as they navigate through the app
 cli_inputs = [
     [
         "jolene",  # user enters jolene
@@ -13,32 +15,56 @@ cli_inputs = [
         "0",  # user selects first song
         "i",  # save to local itunes folder
         "q",  # user quits
+        "y",  # user quits via y/n selection
     ],
     [
         "jolene",  # user enters jolene
         "0",  # user selects first song
+        "https://s"  # user enter invalid download url
         "https://www.youtube.com/watch?v=Ixrje2rXLMA",  # user opts to direct download
         "l",  # save locally
         "q",  # user quits
-    ],
-    [
-        "billy joel",  # user enters billy joel
-        "-1",  # user selects continue without properties
-        "",  # user opts to search youtube
+        "n",  # user selects to continue
+        "billy",  # user searches billy
         "0",  # user selects first song
-        "l",  # user selects  save locally
-        "q",  # user quits
+        "q",  # user quits to main menu
+        "q",  # user quits app
+        "q",  # user confirms quit
     ],
     [
-        "john mayer",  # user enters john mayer
-        "",  # user hits enter by accident
-        "0",  # user continues by selecting property 0
+        "billy joel; john lennon",  # user enters billy joel and john lennon
+        "-1",  # user selects continue without properties
         "",  # user opts to search youtube
         "",  # user hits enter by accident
         "800",  # user enters invalid input
         "0",  # user selects first song
         "l",  # user selects  save locally
-        "q",  # user quits
+        "q",  # user accidentally quits
+        "y",  # user selects to resume
+        "0",  # user selects property 0
+        "q",  # user quits to main menu
+        "q",  # user quits app
+        "y",  # user quits app
+    ],
+    [
+        "album",  # user enters album mode
+        "billy joel the stranger",  # user enters billy joel
+        "",  # validation for empty input
+        "-5",  # user enters invalid value
+        "0",  # user selects album 0
+        "-1",  # user selects keep all songs
+        "-5",  # user enters invalid input
+        "0",  # user selects song property 0 for first song
+        "",  # user hits enter to search youtube
+        "0",  # user selects song 0
+        "l",  # save locally
+        "q",  # select quit
+        "y",  # continue with queued songs
+        "0",  # select property 0
+        "q",  # quit queued songs
+        "n",  # do not continue queue
+        "q",  # quit application
+        "y",  # set yes to are you sure message
     ],
 ]
 

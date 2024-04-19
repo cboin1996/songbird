@@ -10,19 +10,26 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def launch_album_mode(artist_album_string=""):
+def launch_album_mode(artist_album_string="", quit_str="q"):
     """
     Args:
         artist_album_string (str): the album/artist to search for.
 
-    Returns: the list of song properties gathered from the search.
+    Returns: the list of song properties gathered from the search, None if error occured, quit_str if user quit
 
     """
     while True:
         album_props = parse_itunes_search_api(
-            search_variable=artist_album_string, mode=modes.Modes.ALBUM, lookup=False
+            search_variable=artist_album_string,
+            mode=modes.Modes.ALBUM,
+            lookup=False,
+            # disable no selection here, user must select album properties.
+            no_selection_value=None,
         )
         # check if user quit
+        if album_props == quit_str:
+            return quit_str
+
         if album_props is None:
             return None
 
@@ -33,12 +40,21 @@ def launch_album_mode(artist_album_string=""):
             mode=modes.Modes.SONG,
             lookup=True,
         )
+        # api error occurred
         if songs_in_album_props == None:
-            logger.error("Sorry. Cant seem to find any details for this album!")
+            return None
+        # no songs found for album
+        if len(songs_in_album_props) == 0:
+            logger.error(
+                "Sorry. Cant seem to find any details for this album in itunes api! Please select a different album."
+            )
+            return None
 
         songs_in_album_props = remove_songs_selected(
-            song_properties_list=songs_in_album_props
+            song_properties_list=songs_in_album_props, quit_str=quit_str
         )
+        if songs_in_album_props == quit_str:
+            return quit_str
         if songs_in_album_props is None:
             return None
 
@@ -47,8 +63,15 @@ def launch_album_mode(artist_album_string=""):
 
 # entity is usually song for searching songs
 def parse_itunes_search_api(
-    search_variable: str, mode: modes.Modes, limit: int = 20, lookup: bool = False
-) -> Optional[Union[bool, itunes_api.ItunesApiSongModel]]:
+    search_variable: str,
+    mode: modes.Modes,
+    limit: int = 20,
+    lookup: bool = False,
+    no_selection_value: Optional[int] = -1,
+    quit_str: str = "q",
+) -> Optional[
+    Union[bool, itunes_api.ItunesApiSongModel, itunes_api.ItunesApiAlbumKeys]
+]:
     """perform a query of the items api, allowing user to select
     an item from the returned list of options
 
@@ -57,9 +80,11 @@ def parse_itunes_search_api(
         mode (modes.Modes): the mode to run
         limit (int, optional): number of results. Defaults to 20.
         lookup (bool, optional): whether to enable 'lookup' mode in itunes api. Defaults to False.
+        no_selection_value (int, optional): whether to set an option for 'no selection' from stdin
+        quit_str (str, optional): str value used to determine whether to quit the song selection process
 
     Returns:
-        Optional[Union[itunes_api.ItunesApiSongModel]]: returns the selected song properties, a bool=False if use continues without selection, or None if the user quits or an error occurred.
+        Optional[Union[itunes_api.ItunesApiSongModel]]: returns the selected song properties, a bool=False if use continues without selection, None if error occurred, or quit_str if user quit.
     """
     parsed_results_list = itunes.query_api(search_variable, limit, mode, lookup=lookup)
 
@@ -68,16 +93,17 @@ def parse_itunes_search_api(
     logger.info("Searched for: %s" % (search_variable))
     # Only one item can be selected
     user_selection = select_items_from_list(
-        "Select the number for the properties you want",
-        parsed_results_list,
-        1,
-        no_selection_value=-1,
+        prompt="Select the number for the properties you want",
+        lyst=parsed_results_list,
+        n_choices=1,
+        quit_str=quit_str,
+        no_selection_value=no_selection_value,
     )
 
     # user has quit
-    if user_selection is None:
+    if user_selection == quit_str:
         logger.info("Quitting.")
-        return
+        return quit_str
     if len(user_selection) == 0:
         logger.info("Continuing without properties.")
         return False
@@ -89,7 +115,7 @@ def parse_itunes_search_api(
     return user_selection[0]
 
 
-def remove_songs_selected(song_properties_list) -> Optional[List]:
+def remove_songs_selected(song_properties_list, quit_str: str = "q") -> Optional[List]:
     """Given a list of songs properties, allow the user to remove
     via stdio
 
@@ -106,10 +132,13 @@ def remove_songs_selected(song_properties_list) -> Optional[List]:
         song_properties_list,
         n_choices=len(song_properties_list) - 1,
         sep=" ",
+        quit_str=quit_str,
         opposite=True,
         no_selection_value=-1,
     )
     # user has quit
+    if user_input == quit_str:
+        return quit_str
     if user_input == None:
         return None
     # user selects all songs
@@ -131,7 +160,7 @@ def get_input(
         choices (Optional[List], optional): valid character options to parse as input. Defaults to None.
 
     Returns:
-        Optional[Any]: the typed user input, or None if quit or invalid type received.
+        Optional[Any]: the typed user input, None if error occured, quit_str if use quit
     """
     while True:
         built_prompt = prompt
@@ -140,7 +169,7 @@ def get_input(
         built_prompt += " ['q' quits]: "
         inp = input(built_prompt)
         if inp == quit_str:
-            return None
+            return quit_str
 
         # initialize type to be empty by default
         typed = None
@@ -176,12 +205,12 @@ def get_input_list(prompt: str, sep: str, out_type=int, quit_str="q") -> List[in
         ValueError: If the input does not match the given type.
 
     Returns:
-        Optional[List[int]]: the typed list, or None if user quit
+        Optional[List[int]]: the typed list, or the quit_str value if user quits
     """
     while True:
         inp = input(prompt + f" ['{quit_str}' quits]: ")
         if inp == quit_str:
-            return None
+            return quit_str
 
         str_list = inp.split(sep)
         typed_list = []
@@ -213,7 +242,7 @@ def select_items_from_list(
     sep: Optional[str] = None,
     quit_str: str = "q",
     opposite: bool = False,
-    no_selection_value=None,
+    no_selection_value: int = None,
     return_value: bool = True,
 ) -> List:
     """Input validation against a list.
@@ -225,11 +254,11 @@ def select_items_from_list(
         n_choices (int): the number of choices allowed
         quit_str (str): The string to cancel validation and exit. Defaults to "q".
         opposite (bool): return everything BUT the user selection
-        no_selection_value (any): value to indicate no selection wanted from the user
+        no_selection_value (int, optional): value to indicate no selection wanted from the user
         return_value (bool): if true, return the value, otherwise return the indicies of selections
 
     Returns:
-        Optiona[List]: None if user quits, [] if user selects nothing, otherwise a list of the users selections are returned.
+        Optiona[List]: quit_str if user quits, [] if user selects nothing, otherwise a list of the users selections are returned.
     """
     tries = 0
     low = 0
@@ -260,10 +289,12 @@ def select_items_from_list(
         inp = get_input_list(
             prompt + f"{range_display} {no_selection_prompt}",
             sep,
+            quit_str=quit_str,
             out_type=int,
         )
-        if inp is None:
-            return None
+        if inp == quit_str:
+            return quit_str
+
         if len(inp) == 0:
             logger.info("You selected nothing.")
             return []

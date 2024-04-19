@@ -7,7 +7,7 @@ name = "songbirdcli"
 authors = [
     {name = "Christian Boin"},
 ]
-version = "0.2.3"
+version = "0.2.4"
 description = "Songbird's cli."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -43,3 +43,6 @@ package = [
 
 [tool.setuptools.packages.find]
 exclude = ["app", "junit"]
+
+[tool.pytest.ini_options]
+log_cli_level="INFO"
