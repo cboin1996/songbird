@@ -1,7 +1,8 @@
 import logging
 import datetime
 from enum import Enum
-from typing import Optional, List
+from typing import Optional, List, Union
+import requests
 import os, sys, shutil
 
 from songbirdcli import settings
@@ -114,6 +115,7 @@ def run_download_process(
     render_wait: float,
     render_retries: int,
     render_sleep: int,
+    quit_str: str = "q",
 ) -> str:
     """Download a song from youtube.
 
@@ -129,18 +131,40 @@ def run_download_process(
         render_sleep (int): the amount of time to wait after rendering
 
     Returns:
-        str: the path on disk that the file was saved to. None if the download fails.
+        str: the path on disk that the file was saved to, None if failure occured, quit_str if user quit
     """
-    # obtain video selection from user
-    video_url = helpers.get_input(
-        prompt=f"Enter a URL, or hit enter to use '{youtube_query_payload}' as a query to youtube: ",
-        out_type=str,
-    )
+    is_valid_url = False
+    while not is_valid_url:
+        # obtain video selection from user
+        video_url = helpers.get_input(
+            prompt=f"Enter a URL, or hit enter to use '{youtube_query_payload}' as a query to youtube: ",
+            out_type=str,
+            quit_str=quit_str,
+        )
+        # if user hits enter, bypass url checks
+        if video_url == "":
+            break
 
-    if video_url is None:
-        return None
+        if video_url == quit_str:
+            return quit_str
 
-    # empty str (enter) query youtube
+        if video_url is None:
+            return None
+        try:
+            response = requests.get(video_url)
+        except Exception as e:
+            logger.error(f"exception occured testing your url: {e}")
+            continue
+
+        # only continue if url was valid
+        if response.status_code == 200:
+            is_valid_url = True
+        else:
+            logger.error(
+                f"URL is valid, but could not receive 200 status from {video_url}, is internet down?"
+            )
+
+        # empty str (enter) query youtube
     if video_url == "":
         link_list, links = youtube.get_video_links(
             youtube_home_url,
@@ -164,6 +188,9 @@ def run_download_process(
             1,
             return_value=False,
         )
+        if video_selection_idx == quit_str:
+            return quit_str
+
         if video_selection_idx is None or len(video_selection_idx) == 0:
             return None
 
@@ -176,13 +203,17 @@ def run_for_song(
     config: settings.SongbirdCliConfig,
     song_name: str,
     song_properties: Optional[itunes_api.ItunesApiSongModel],
-):
+    quit_str: str = "q",
+) -> Union[bool, None, str]:
     """Run a cycle of the application given a song.
 
     Args:
         config (settings.SongbirdConfig): the songbird config
         song_name (str): the name of the song to run the app for
         song_properties (Optional[itunes_api.ItunesApiSongModel]): optionally include song properties. Including these skips the itunes api parser.
+
+    Returns:
+        Union[bool, None, str]: returns boolean indicating success/failure. None indicated error occurred, quit_str indicates user quit
     """
     logger.info(f"Searching for: {song_name}")
     file_itunes = []
@@ -207,15 +238,18 @@ def run_for_song(
         inp = helpers.get_input(
             "Do you want to proceed with download anyway?", choices=["y", "n"]
         )
+        # user quits or selects no
+        if inp == quit_str or inp == "n":
+            return quit_str
 
-        if inp is None or inp == "n":
+        if inp is None:
             return
 
     if song_properties is None:
         song_properties = helpers.parse_itunes_search_api(song_name, modes.Modes.SONG)
 
-    if song_properties is None:
-        return
+    if song_properties == quit_str:
+        return quit_str
 
     file_path_no_format = os.path.join(config.get_local_folder_path(), song_name)
     file_path = file_path_no_format + "." + file_format
@@ -251,9 +285,19 @@ def run_for_song(
             render_wait=config.youtube_render_wait,
             render_retries=config.youtube_render_retries,
             render_sleep=config.youtube_render_sleep,
+            quit_str=quit_str,
         )
+    if downloaded_file_path == quit_str:
+        return quit_str
 
     if downloaded_file_path is None:
+        return
+
+    # perform sanity check in case no file exists and yt-dlp didnt throw an error
+    if not os.path.exists(downloaded_file_path):
+        logger.error(
+            f"yt-dlp reported no error downloading file, but file does not exist. Cannot proceed with tagging as no file exists."
+        )
         return
 
     if song_properties != False:
@@ -294,6 +338,8 @@ def run_for_song(
     if not config.itunes_enabled and not config.gdrive_enabled:
         inp = "l"
 
+    if inp == quit_str:
+        return quit_str
     if inp is None:
         return
 
@@ -346,6 +392,53 @@ def run_for_song(
     return True
 
 
+def get_songs_from_user(
+    current_mode: modes.Modes, quit_str: str = "q"
+) -> Optional[Union[str, List[str]]]:
+    # launch album mode to collect songs
+    if current_mode == modes.Modes.ALBUM:
+        album_name = helpers.get_input(
+            f"Enter an album name.", out_type=str, quit_str=quit_str
+        )
+        # quit condition
+        if album_name == quit_str:
+            return quit_str
+        if album_name is None:
+            return None
+
+        mode = resolve_mode(album_name, current_mode=current_mode)
+        # detect mode change and return to main menu
+        if mode is not None:
+            return mode
+
+        album_song_properties = helpers.launch_album_mode(album_name)
+        # quit iteration to main menu
+        if album_song_properties == quit_str:
+            return quit_str
+        if album_song_properties is None:
+            return None
+        return [song.trackName for song in album_song_properties]
+
+    # launch song mode to collect songs
+    elif current_mode == modes.Modes.SONG:
+        songs = helpers.get_input_list(
+            "Please input song(s), separated by ';'. E.g. song1; song2; song3.",
+            out_type=str,
+            sep="; ",
+        )
+        # quit iteration to main menu
+        if songs == quit_str:
+            return quit_str
+        if songs is None:
+            return None
+
+        mode = resolve_mode(songs[0], current_mode=current_mode)
+        # detect mode change and return to main menu
+        if mode is not None:
+            return mode
+        return songs
+
+
 def run(config: settings.SongbirdCliConfig):
     """main entrypoint for songbirdcli. Expects the songbirdcli config object.
 
@@ -353,6 +446,8 @@ def run(config: settings.SongbirdCliConfig):
         config (settings.SongbirdCliConfig): songbirdcli settings pydantic model
 
     """
+    # setup quit str for user
+    quit_str = "q"
     try:
         common.set_logger_config_globally(log_level=config.log_level)
         common.name_plate(entries=[f"--cli {config.version}"])
@@ -376,43 +471,54 @@ def run(config: settings.SongbirdCliConfig):
 
             song_properties = None
             album_song_properties = None
-            # launch album mode to collect songs
-            if current_mode == modes.Modes.ALBUM:
-                album_name = helpers.get_input(f"Enter an album name.", out_type=str)
-                # quit condition
-                if album_name is None:
-                    break
-                mode = resolve_mode(album_name, current_mode=current_mode)
-                # detect mode change and return to main menu
-                if mode is not None:
-                    current_mode = mode
-                    continue
-
-                album_song_properties = helpers.launch_album_mode(album_name)
-                if album_song_properties is None:
-                    break
-
-                songs = [song.trackName for song in album_song_properties]
-            elif current_mode == modes.Modes.SONG:
-                songs = helpers.get_input_list(
-                    "Please input song(s), separated by ';'. E.g. song1; song2; song3.",
+            result = get_songs_from_user(current_mode=current_mode, quit_str=quit_str)
+            # user quits
+            if result == quit_str:
+                return_to_menu = helpers.get_input(
+                    prompt=f"Are you sure you want to quit?",
+                    choices=["y", "n"],
                     out_type=str,
-                    sep="; ",
+                    quit_str=quit_str,
                 )
-                # quit condition
-                if songs is None:
-                    break
-                mode = resolve_mode(songs[0], current_mode=current_mode)
-                # detect mode change and return to main menu
-                if mode is not None:
-                    current_mode = mode
+                # allow user to return to main menu before
+                # full shutdown
+                if return_to_menu == "n":
                     continue
 
+                return quit_str
+
+            # user changed mode
+            if isinstance(result, modes.Modes):
+                current_mode = result
+                continue
+
+            # error occurred
+            if result is None:
+                continue
+            # set songs to result and continue otherwise
+            songs = result
             logger.info(f"Searching for songs: {songs}")
             for i, song in enumerate(songs):
                 if album_song_properties is not None:
                     song_properties = album_song_properties[i]
-                success = run_for_song(config, song, song_properties)
+                success = run_for_song(config, song, song_properties, quit_str)
+
+                # detect if more songs are queued, and asks if user wants to continue with other songs
+                if (success == quit_str or success == None) and i + 1 < len(songs):
+                    songs_remaining = songs[i + 1 :]
+                    common.pretty_lst_printer(songs_remaining)
+                    return_to_menu = helpers.get_input(
+                        prompt=f"You have {len(songs_remaining)} songs (above) in queue. Would you like to continue?",
+                        choices=["y", "n"],
+                        out_type=str,
+                        quit_str=quit_str,
+                    )
+                    # only return to main menu if user opts to, otherwise enter next iteration
+                    # to preserve list of selections
+                    if return_to_menu == "n" or return_to_menu == quit_str:
+                        break
+                    if return_to_menu == "y":
+                        continue
 
     except KeyboardInterrupt as e:
         logger.info("\nReceived keyboard interrupt :o")
