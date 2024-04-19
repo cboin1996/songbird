@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://cboin1996.github.io/songbird/v0.2.4/</loc>
+         <lastmod>2024-04-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://cboin1996.github.io/songbird/v0.2.4/songbirdcli/cli/</loc>
+         <lastmod>2024-04-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://cboin1996.github.io/songbird/v0.2.4/songbirdcli/helpers/</loc>
+         <lastmod>2024-04-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://cboin1996.github.io/songbird/v0.2.4/songbirdcli/settings/</loc>
+         <lastmod>2024-04-19</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>
