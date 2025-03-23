@@ -196,7 +196,9 @@ def run_download_process(
 
         video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
     # Process the download, and save locally
-    return youtube.run_download(video_url, file_path_no_format, file_format)
+    return youtube.run_download(
+        video_url, file_path_no_format, file_format, embed_thumbnail=True
+    )
 
 
 def run_for_song(
