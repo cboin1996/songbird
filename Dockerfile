@@ -1,4 +1,4 @@
-FROM ubuntu:23.04 AS builder
+FROM ubuntu:24.04 AS builder
 
 WORKDIR /app
 
