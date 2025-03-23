@@ -1,4 +1,5 @@
-FROM ubuntu:24.04 AS builder
+ARG UBUNTU_VERSION="24.04"
+FROM ubuntu:${UBUNTU_VERSION} AS builder
 
 WORKDIR /app
 
@@ -16,7 +17,7 @@ COPY songbirdcli/requirements.txt .
 # install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-FROM ubuntu:23.04 as build-image
+FROM ubuntu:${UBUNTU_VERSION} AS build-image
 
 ENV PATH="/venv/bin:$PATH"
 
@@ -46,7 +47,7 @@ RUN pip install . && playwright install chromium
 CMD ["python3", "songbirdcli/cli.py"]
 
 # RUN tests to confirm built code runs as expected
-FROM build-image as test
+FROM build-image AS test
 
 RUN pip install -e .[dev]
 COPY tests ./tests
