@@ -2,6 +2,9 @@
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
+[project.scripts]
+songbirdcli = "songbirdcli.cli:run"
+
 [project]
 name = "songbirdcli"
 authors = [

@@ -461,13 +461,15 @@ def get_songs_from_user(
     return songs
 
 
-def run(config: settings.SongbirdCliConfig):
+def run(config: Optional[settings.SongbirdCliConfig] = None):
     """main entrypoint for songbirdcli. Expects the songbirdcli config object.
 
     Args:
         config (settings.SongbirdCliConfig): songbirdcli settings pydantic model
 
     """
+    if not config:
+        config = settings.SongbirdCliConfig(version=version.version)
     # setup quit str for user
     quit_str = "q"
     try:
