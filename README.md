@@ -2,6 +2,24 @@
 
 Music downloading client featuring mp3 or m4a tagging.
 
+## Install via Pip
+
+Run
+
+```bash
+pip install songbirdcli
+```
+
+To run (with minimal features enabled) use:
+
+```bash
+RUN_LOCAL=true GDRIVE_ENABLED=false ITUNES_ENABLED=false python3 songbirdcli
+```
+
+See [Configuration](#configuration) for how to configure the CLI via
+Environment variables. Without configuration, songbirdcli saves it's data
+relative to the script's directory.
+
 ## Install via Docker
 
 To run the app via docker, you will require:

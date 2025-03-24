@@ -48,7 +48,7 @@ cli_inputs = [
     ],
     [
         "album",  # user enters album mode
-        "billy joel the stranger",  # user enters billy joel
+        "weyes blood andromeda",  # user enters song
         "",  # validation for empty input
         "-5",  # user enters invalid value
         "0",  # user selects album 0

@@ -196,7 +196,9 @@ def run_download_process(
 
         video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
     # Process the download, and save locally
-    return youtube.run_download(video_url, file_path_no_format, file_format)
+    return youtube.run_download(
+        video_url, file_path_no_format, file_format, embed_thumbnail=True
+    )
 
 
 def run_for_song(
@@ -459,13 +461,15 @@ def get_songs_from_user(
     return songs
 
 
-def run(config: settings.SongbirdCliConfig):
+def run(config: Optional[settings.SongbirdCliConfig] = None):
     """main entrypoint for songbirdcli. Expects the songbirdcli config object.
 
     Args:
         config (settings.SongbirdCliConfig): songbirdcli settings pydantic model
 
     """
+    if not config:
+        config = settings.SongbirdCliConfig(version=version.version)
     # setup quit str for user
     quit_str = "q"
     try:
