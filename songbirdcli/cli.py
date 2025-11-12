@@ -4,6 +4,7 @@ from enum import Enum
 from typing import Optional, List, Union
 import requests
 import os, sys, shutil
+from urllib.parse import urlparse, parse_qsl, urlunparse, urlencode
 
 from songbirdcli import settings
 from songbirdcli import helpers
@@ -105,6 +106,34 @@ def resolve_mode(
         return None
 
 
+def get_url_with_specific_params(url, allowed_params):
+    """
+    Constructs a new URL containing only the specified query parameters.
+
+    Args:
+        url (str): The original URL.
+        allowed_params (list): A list of strings representing the names
+                               of the query parameters to include.
+
+    Returns:
+        str: The new URL with only the allowed query parameters.
+    """
+    parsed_url = urlparse(url)
+    query_params = parse_qsl(parsed_url.query)
+
+    # Filter out only the allowed parameters
+    filtered_params = [
+        (key, value) for key, value in query_params if key in allowed_params
+    ]
+
+    # Reconstruct the query string
+    new_query_string = urlencode(filtered_params)
+
+    # Reconstruct the URL with the new query string
+    new_url_parts = parsed_url._replace(query=new_query_string)
+    return urlunparse(new_url_parts)
+
+
 def run_download_process(
     file_path_no_format: str,
     youtube_home_url: str,
@@ -195,9 +224,11 @@ def run_download_process(
             return None
 
         video_url = youtube_home_url + links[video_selection_idx[0]].attrs["href"]
+
+    parsed_video_url = get_url_with_specific_params(video_url, ["v"])
     # Process the download, and save locally
     return youtube.run_download(
-        video_url, file_path_no_format, file_format, embed_thumbnail=True
+        parsed_video_url, file_path_no_format, file_format, embed_thumbnail=True
     )
 
 

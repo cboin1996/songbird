@@ -130,12 +130,20 @@ def load_mp3_config(create_test_folder, monkeypatch, request):
     return config
 
 
+@pytest.mark.skipif(
+    os.getenv("ENV", None) not in ["dev", "test"],
+    reason="Test should only be run locally, signified by ENV=dev|test",
+)
 @pytest.mark.parametrize("load_mp3_config", cli_inputs, indirect=True)
 def test_cli_mp3(load_mp3_config):
     # invoke the main function of the cli
     cli.run(config=load_mp3_config)
 
 
+@pytest.mark.skipif(
+    os.getenv("ENV", None) not in ["dev", "test"],
+    reason="Test should only be run locally, signified by ENV=dev|test",
+)
 @pytest.mark.parametrize("load_m4a_config", cli_inputs, indirect=True)
 def test_cli_m4a(load_m4a_config):
     # invoke the main function of the cli
