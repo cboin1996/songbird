@@ -22,7 +22,7 @@ FROM ubuntu:${UBUNTU_VERSION} AS build-image
 ENV PATH="/venv/bin:$PATH"
 
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg python3-pip \
+RUN apt-get update && apt-get install -y --no-install-recommends curl unzip ffmpeg python3-pip \
     # playwright deps
     libnss3 \
     libnspr4 \
@@ -32,6 +32,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg python3-
     libatspi2.0-0 \
     libxcomposite1 \
     libxdamage1 && \
+    # install deno for yt-dlp youtube extraction
+    curl -fsSL https://deno.land/install.sh | sh && \
     # clear cache
     rm -rf /var/lib/apt/lists/*
 
@@ -42,7 +44,8 @@ COPY ./songbirdcli/ ./songbirdcli
 COPY pyproject.toml .
 
 # install package locally, and setup playwright
-RUN pip install . && playwright install chromium
+ENV PATH="/root/.deno/bin:$PATH"
+RUN pip install . && playwright install chromium && deno --help
 
 CMD ["python3", "songbirdcli/cli.py"]
 
@@ -51,5 +54,8 @@ FROM build-image AS test
 
 RUN pip install -e .[dev]
 COPY tests ./tests
+COPY --from=build-image /root/.deno/bin /root/.deno/bin
+ENV PATH="/root/.deno/bin:$PATH"
+
 WORKDIR /app
-RUN python3 -m pytest ./tests/unit/
+RUN ENV=dev python3 -m pytest ./tests/unit/
