@@ -52,7 +52,6 @@ requirements: env
 ifeq ($(ENV), dev)
 	echo "install dev dependencies"
 	pip install -e .[dev]
-	pip install -e ../songbirdcore
 else
 	pip install -e .
 endif
