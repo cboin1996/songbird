@@ -106,9 +106,8 @@ def resolve_mode(
         return None
 
 
-def get_url_with_specific_params(url, allowed_params):
-    """
-    Constructs a new URL containing only the specified query parameters.
+def get_url_with_specific_params(url: str, allowed_params: list):
+    """Constructs a new URL containing only the specified query parameters.
 
     Args:
         url (str): The original URL.
