@@ -2,6 +2,11 @@
 
 Music downloading client featuring mp3 or m4a tagging.
 
+## Dependencies
+
+1. [deno](https://deno.com/)
+2. [ffmpeg](https://www.ffmpeg.org/)
+
 ## Install via Pip
 
 Run
@@ -19,6 +24,7 @@ RUN_LOCAL=true GDRIVE_ENABLED=false ITUNES_ENABLED=false python3 songbirdcli
 See [Configuration](#configuration) for how to configure the CLI via
 Environment variables. Without configuration, songbirdcli saves it's data
 relative to the script's directory.
+
 
 ## Install via Docker
 
