@@ -2,3 +2,4 @@
 !songbirdcli
 !pyproject.toml
 !tests
+!uv.lock

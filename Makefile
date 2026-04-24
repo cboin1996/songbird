@@ -1,5 +1,4 @@
 APP_NAME=songbirdcli
-REQUIREMENTS_FILE=requirements.txt
 
 .PHONY: env
 env:
@@ -26,9 +25,13 @@ ENV_VARS = $(shell cat $(ENV).env | xargs)
 
 .PHONY: setup
 setup:
-	@echo sets up the development environment
-	python3 -m venv venv
-	@echo activate venv with 'source venv/bin/activate'
+	uv sync --extra dev
+	uv run playwright install
+
+.PHONY: upgrade
+upgrade:
+	uv lock --upgrade
+	uv sync --extra dev
 
 # /app/data folder is legacy for backwards compatability
 # from the times before songbird was split across
@@ -45,24 +48,6 @@ volumesclean:
 	rm -rf ./$(APP_NAME)/data/local_chromium
 	rm -rf ./$(APP_NAME)/data/gdrive
 
-.PHONY: requirements
-requirements: env
-	pip install -r $(APP_NAME)/$(REQUIREMENTS_FILE)
-# only install dependencies locally if in dev env
-ifeq ($(ENV), dev)
-	echo "install dev dependencies"
-	pip install -e .[dev]
-else
-	pip install -e .
-endif
-	playwright install
-
-.PHONY: update-requirements
-update-requirements: env
-	pip freeze --exclude-editable | xargs pip uninstall -y
-	rm $(APP_NAME)/$(REQUIREMENTS_FILE) || true
-	pip install -r $(APP_NAME)/requirements.txt.blank
-	pip freeze --exclude-editable > $(APP_NAME)/$(REQUIREMENTS_FILE)
 
 # documentation targets
 .PHONY: docs-lint
@@ -82,7 +67,7 @@ docs-build:
 
 .PHONY: build
 build:
-	docker build -t $(APP_NAME):latest .
+	DOCKER_BUILDKIT=1 docker build -t $(APP_NAME):latest .
 
 .PHONY: run-itunes
 run-itunes:
@@ -121,17 +106,17 @@ stop:
 dev: clean build run
 
 lint:
-	black $(APP_NAME)/.
-	black tests
+	uv run black $(APP_NAME)/.
+	uv run black tests
 
-.PHONY: test-cov
+.PHONY: test-stdout
 test-stdout:
-	python -m pytest --cov=songbirdcli tests/unit -v
+	uv run pytest --cov=songbirdcli tests/unit -v
 
 .PHONY: test
 test:
-	python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=songbirdcli --cov-report=xml --cov-report=html tests/unit -v
+	uv run pytest --doctest-modules --junitxml=junit/test-results.xml --cov=songbirdcli --cov-report=xml --cov-report=html tests/unit -v
 
 .PHONY: test-env
 test-env:
-	$(ENV_VARS) python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=songbirdcli --cov-report=xml --cov-report=html tests/unit -v
+	$(ENV_VARS) uv run pytest --doctest-modules --junitxml=junit/test-results.xml --cov=songbirdcli --cov-report=xml --cov-report=html tests/unit -v

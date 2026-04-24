@@ -10,17 +10,41 @@ name = "songbirdcli"
 authors = [
     {name = "Christian Boin"},
 ]
-version = "0.3.1"
+version = "0.3.2"
 description = "Songbird's cli."
 readme = "README.md"
 requires-python = ">=3.11"
-dynamic = ["dependencies"]
+dependencies = [
+    "beautifulsoup4",
+    "cryptography",
+    "deprecation",
+    "eyeD3",
+    "fake-useragent",
+    "filetype",
+    "google-api-python-client",
+    "google-auth",
+    "google-auth-httplib2",
+    "google-auth-oauthlib",
+    "lxml",
+    "lxml_html_clean",
+    "mutagen",
+    "parse",
+    "playwright",
+    "pycryptodomex",
+    "pydantic",
+    "pydantic-settings",
+    "pyquery",
+    "python-dotenv",
+    "requests",
+    "requests-htmlc",
+    "songbirdcore",
+    "w3lib",
+    "yt-dlp",
+    "yt-dlp-ejs",
+]
 
 [project.urls]
 Documentation = "https://cboin1996.github.io/songbird/"
-
-[tool.setuptools.dynamic]
-dependencies = {file = ["songbirdcli/requirements.txt"]}
 
 [project.optional-dependencies]
 # these dependencies are required for development,

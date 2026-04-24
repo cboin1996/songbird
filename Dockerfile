@@ -3,26 +3,23 @@ FROM ubuntu:${UBUNTU_VERSION} AS builder
 
 WORKDIR /app
 
-# make sure we use the venv
-ENV PATH="/venv/bin:$PATH"
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc git python3 python3-pip python3-venv && \
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc git python3 && \
     rm -rf /var/lib/apt/lists/*
 
-# setup venv
-RUN python3 -m venv /venv
-
-COPY songbirdcli/requirements.txt .
+COPY pyproject.toml uv.lock ./
+COPY ./songbirdcli/ ./songbirdcli
 
 # install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv sync --frozen --no-dev
 
 FROM ubuntu:${UBUNTU_VERSION} AS build-image
 
-ENV PATH="/venv/bin:$PATH"
+ENV PATH="/app/.venv/bin:$PATH"
 
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends curl unzip ffmpeg python3-pip \
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl unzip ffmpeg python3 \
     # playwright deps
     libnss3 \
     libnspr4 \
@@ -32,30 +29,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl unzip ffmp
     libatspi2.0-0 \
     libxcomposite1 \
     libxdamage1 && \
-    # install deno for yt-dlp youtube extraction
-    curl -fsSL https://deno.land/install.sh | sh && \
+    # install deno for yt-dlp youtube extraction (arch-aware)
+    ARCH=$(uname -m | sed 's/x86_64/x86_64/;s/aarch64/aarch64/') && \
+    curl -fsSL "https://github.com/denoland/deno/releases/latest/download/deno-${ARCH}-unknown-linux-gnu.zip" -o /tmp/deno.zip && \
+    unzip /tmp/deno.zip -d /usr/local/bin && \
+    rm /tmp/deno.zip && \
     # clear cache
     rm -rf /var/lib/apt/lists/*
 
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 # copy venv
-COPY --from=builder /venv /venv
-# copy app contents 
+COPY --from=builder /app/.venv /app/.venv
+# copy app contents
 COPY ./songbirdcli/ ./songbirdcli
-COPY pyproject.toml .
+COPY pyproject.toml uv.lock .
 
-# install package locally, and setup playwright
-ENV PATH="/root/.deno/bin:$PATH"
-RUN pip install . && playwright install chromium && deno --help
+# setup playwright
+RUN playwright install chromium && deno --help
 
 CMD ["python3", "songbirdcli/cli.py"]
 
 # RUN tests to confirm built code runs as expected
 FROM build-image AS test
 
-RUN pip install -e .[dev]
+RUN uv sync --frozen --extra dev
 COPY tests ./tests
-COPY --from=build-image /root/.deno/bin /root/.deno/bin
-ENV PATH="/root/.deno/bin:$PATH"
 
 WORKDIR /app
-RUN ENV=dev python3 -m pytest ./tests/unit/
+RUN ENV=dev pytest ./tests/unit/
