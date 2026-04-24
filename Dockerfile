@@ -29,8 +29,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     libatspi2.0-0 \
     libxcomposite1 \
     libxdamage1 && \
-    # install deno for yt-dlp youtube extraction
-    curl -fsSL "https://github.com/denoland/deno/releases/latest/download/deno-x86_64-unknown-linux-gnu.zip" -o /tmp/deno.zip && \
+    # install deno for yt-dlp youtube extraction (arch-aware)
+    ARCH=$(uname -m | sed 's/x86_64/x86_64/;s/aarch64/aarch64/') && \
+    curl -fsSL "https://github.com/denoland/deno/releases/latest/download/deno-${ARCH}-unknown-linux-gnu.zip" -o /tmp/deno.zip && \
     unzip /tmp/deno.zip -d /usr/local/bin && \
     rm /tmp/deno.zip && \
     # clear cache
