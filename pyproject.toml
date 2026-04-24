@@ -10,7 +10,7 @@ name = "songbirdcli"
 authors = [
     {name = "Christian Boin"},
 ]
-version = "0.3.1"
+version = "0.3.2"
 description = "Songbird's cli."
 readme = "README.md"
 requires-python = ">=3.11"
