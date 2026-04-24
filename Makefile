@@ -67,7 +67,7 @@ docs-build:
 
 .PHONY: build
 build:
-	docker build -t $(APP_NAME):latest .
+	DOCKER_BUILDKIT=1 docker build -t $(APP_NAME):latest .
 
 .PHONY: run-itunes
 run-itunes:
