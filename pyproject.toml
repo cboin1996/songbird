@@ -10,7 +10,7 @@ name = "songbirdcli"
 authors = [
     {name = "Christian Boin"},
 ]
-version = "0.3.4"
+version = "0.3.5"
 description = "Songbird's cli."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -37,7 +37,7 @@ dependencies = [
     "python-dotenv",
     "requests",
     "requests-htmlc",
-    "songbirdcore>=0.1.12",
+    "songbirdcore>=0.1.13",
     "w3lib",
     "yt-dlp",
     "yt-dlp-ejs",
